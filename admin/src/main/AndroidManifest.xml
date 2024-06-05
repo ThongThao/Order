@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Order">
+        <activity
+            android:name=".screens.Menu.UpdateItem"
+            android:exported="false"
+            android:label="@string/title_activity_update_item"
+            android:theme="@style/Theme.Order" />
+        <activity
+            android:name=".screens.User.AllUser"
+            android:exported="false"
+            android:label="@string/title_activity_all_user"
+            android:theme="@style/Theme.Order" />
+        <activity
+            android:name=".screens.Menu.AllItem"
+            android:exported="false"
+            android:label="@string/title_activity_all_item"
+            android:theme="@style/Theme.Order" />
+        <activity
+            android:name=".screens.Menu.AddItem"
+            android:exported="true"
+            android:label="@string/title_activity_add_item"
+            android:theme="@style/Theme.Order"></activity>
+        <activity
+            android:name=".screens.Menu.MenuRes"
+            android:exported="false"
+            android:label="@string/title_activity_menu_res"
+            android:theme="@style/Theme.Order" />
+        <activity
+            android:name=".screens.Home"
+            android:exported="false"
+            android:label="@string/title_activity_home"
+            android:theme="@style/Theme.Order" />
+        <activity
+            android:name=".screens.Restaurant.UpdateRestaurant"
+            android:exported="false"
+            android:label="@string/title_activity_update_restaurant"
+            android:theme="@style/Theme.Order" />
+        <activity
+            android:name=".screens.Restaurant.AddRestaurant"
+            android:exported="false"
+            android:label="@string/title_activity_add_restaurant"
+            android:theme="@style/Theme.Order" />
+        <activity
+            android:name=".screens.Restaurant.AllRestaurant"
+            android:exported="false"
+            android:label="@string/title_activity_all_restaurant"
+            android:theme="@style/Theme.Order" />
+        <activity
+            android:name=".screens.Category.UpdateCategory"
+            android:exported="false"
+            android:label="@string/title_activity_update_category"
+            android:theme="@style/Theme.Order" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Order">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".screens.Category.AllCategory"
+            android:exported="true"
+            android:label="@string/title_activity_all_category"
+            android:theme="@style/Theme.Order" />
+        <activity
+            android:name=".screens.Category.AddCategory"
+            android:exported="true"
+            android:label="@string/title_activity_add_category"
+            android:theme="@style/Theme.Order" />
+    </application>
+
+</manifest>

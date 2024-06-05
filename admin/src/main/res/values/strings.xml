@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">admin</string>
+    <string name="title_activity_add_category">AddCategory</string>
+    <string name="title_activity_all_category">AllCategory</string>
+    <string name="title_activity_update_category">UpdateCategory</string>
+    <string name="title_activity_all_restaurant">AllRestaurant</string>
+    <string name="title_activity_add_restaurant">AddRestaurant</string>
+    <string name="title_activity_update_restaurant">UpdateRestaurant</string>
+    <string name="title_activity_home">Home</string>
+    <string name="title_activity_menu_res">MenuRes</string>
+    <string name="title_activity_add_item">AddItem</string>
+    <string name="title_activity_all_item">AllItem</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_all_user">AllUser</string>
+    <string name="title_activity_update_item">UpdateItem</string>
+</resources>
