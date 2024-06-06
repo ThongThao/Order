@@ -1,5 +1,6 @@
 package com.example.order.Screens
 
+import CartDetail
 import CartScreen
 import EditProfileScreen
 import SignInScreen
@@ -297,9 +298,11 @@ fun HomeNavHost(navHostController: NavHostController, userId: String?) {
             val userId = backStackEntry.arguments?.getString("userId")
             CartScreen(userId ,navController = navHostController)
         }
-        composable(route = Screen.CartDetail.route) { backStackEntry ->
+        composable(route = "cart_detail/{userId}/{restaurantName}",
+            arguments = listOf(navArgument("userId"){ type = NavType.StringType }, navArgument("restaurantName"){ type = NavType.StringType })) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId")
             val restaurantName = backStackEntry.arguments?.getString("restaurantName")
-            CartDetail(restaurantName)
+            CartDetail(userId,restaurantName,navController = navHostController)
         }
         composable(route = Screen.Edit.route,
             arguments = listOf(navArgument("userId") { type = NavType.StringType })) { backStackEntry ->

@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.app.R
-import com.example.order.navigation.Screen
 import com.example.order.ui.theme.orange
 import com.example.order.ui.theme.secondaryFontColor
 import java.text.NumberFormat
@@ -82,9 +81,8 @@ fun CartScreen(userId: String?, cartViewModel: CartViewModel = viewModel(), navC
                 it.forEach { (restaurantName, restaurantCart) ->
                     item {
                         Row {
-
                             Column(modifier = Modifier.clickable {
-                                navController.navigate(Screen.CartDetail.route)
+                                navController.navigate("cart_detail/${userId}/${restaurantName}")
                             }) {
                                 Text(
                                     text = restaurantName,

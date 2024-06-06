@@ -5,6 +5,7 @@ import CartItem
 import CartViewModel
 import RestaurantCart
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -311,7 +312,7 @@ fun RestaurantDetailScreen(
                                         },
                                         onError = { errorMessage ->
                                             coroutineScope.launch {
-                                               
+                                                Log.e("TAG", "onErr: $errorMessage" )
                                             }
                                         }
                                     )
@@ -350,7 +351,9 @@ fun RestaurantDetailScreen(
                         }
 
                     }
-                    Row (modifier = Modifier.padding(10.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
+                    Row (modifier = Modifier
+                        .padding(10.dp)
+                        .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
 
                         Box(
                             modifier = Modifier
@@ -514,7 +517,8 @@ fun RestaurantDetailScreen(
                     ) {
                         Box(
                             modifier = Modifier
-                                .fillMaxWidth().height(270.dp),
+                                .fillMaxWidth()
+                                .height(270.dp),
                             contentAlignment = Alignment.BottomStart
                         ) {
                             Column() {
