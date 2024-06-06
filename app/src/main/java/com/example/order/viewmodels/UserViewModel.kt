@@ -7,7 +7,10 @@ import com.example.order.model.User
 import com.google.firebase.firestore.FirebaseFirestore
 
 class UserViewModel: ViewModel() {
+    private var currentUserId: String = ""
+    private var currentUser: User? = null
     fun getUser(userId: String?): LiveData<User?> {
+
         val userLiveData = MutableLiveData<User?>()
         userId?.let {
             FirebaseFirestore.getInstance().collection("users")
@@ -23,4 +26,19 @@ class UserViewModel: ViewModel() {
         }
         return userLiveData
     }
+    fun updateUser(userId: String?, updatedUser: User, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        userId?.let {
+            FirebaseFirestore.getInstance().collection("users")
+                .document(it)
+                .set(updatedUser)
+                .addOnSuccessListener {
+                    onSuccess()
+                }
+                .addOnFailureListener { e ->
+                    onFailure(e)
+                }
+        }
+    }
+
+
 }

@@ -58,5 +58,17 @@ sealed class Screen(
     {
         fun createRoute(userId: String) = "cart/$userId"
     }
+    object Edit: Screen(
+        route = "edit/{userId}"
+    )
+    {
+        fun createRoute(userId: String) = "edit/$userId"
+    }
+    object CartDetail: Screen(
+        route = "cart_detail/{restaurantName}"
+    )
+    {
+        fun createRoute(restaurantName: String) = "cart_detail/$restaurantName"
+    }
 
 }

@@ -42,9 +42,11 @@ import com.example.order.ui.theme.OrderTheme
 import com.example.order.ui.theme.orange
 import com.example.order.ui.theme.red
 import com.example.order.viewmodels.UserViewModel
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 @Composable
-fun ProfileScreen(userViewModel: UserViewModel = viewModel(),userId: String?) {
+fun ProfileScreen(userViewModel: UserViewModel = viewModel(),userId: String?,navToEdit: () -> Unit,navToLogin: () -> Unit) {
     val user by userViewModel.getUser(userId).observeAsState()
     user?.let {
         OrderTheme {
@@ -92,7 +94,7 @@ fun ProfileScreen(userViewModel: UserViewModel = viewModel(),userId: String?) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(87.5.dp)
-                            .clickable { /* Xử lý khi nút được nhấn */ },
+                            .clickable {navToEdit()},
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
@@ -240,8 +242,8 @@ fun ProfileScreen(userViewModel: UserViewModel = viewModel(),userId: String?) {
                         )
                         Spacer(modifier = Modifier.width(116.dp))
                         IconButton(onClick = {
-
-
+                            Firebase.auth.signOut()
+                            navToLogin()
                         }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_forward),
@@ -284,6 +286,7 @@ fun ProfileScreen(userViewModel: UserViewModel = viewModel(),userId: String?) {
         }
     }
 }
+
 
 @Composable
 fun ProfileImage(modifier: Modifier = Modifier, image: String) {

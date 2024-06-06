@@ -1,6 +1,8 @@
 package com.example.order.Screens
 
 import CartScreen
+import EditProfileScreen
+import SignInScreen
 import android.annotation.SuppressLint
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -232,22 +234,27 @@ fun HomeNavHost(navHostController: NavHostController, userId: String?) {
         composable(
             route = HomeScreens.PROFILE.name,
         ) {
-            ProfileScreen(userId = userId)
+            ProfileScreen(userId = userId,
+                navToEdit = {
+                    navHostController.navigate(Screen.Edit.createRoute(userId ?: ""))
+                },
+                navToLogin = {navHostController.navigate(Screen.Login.route)}
+                )
         }
-
+        composable(route = Screen.Login.route) {
+            SignInScreen(
+                navToHome = { user ->
+                    navHostController.navigate(Screen.Home.createRoute(user.id ?: ""))
+                },
+                navToSignUp = {
+                    navHostController.navigate(Screen.Register.route)
+                }
+            )
+        }
         composable(
             route = HomeScreens.MORE.name,
         ) {
-            val homeViewModel: HomeViewModel = viewModel()
-            HomeScreen(homeViewModel, navToRes = {
-                navHostController.navigate(Screen.Restaurant.createRoute(userId ?: ""))
-            },
-                navToCart={},
-                navToChangeAddress = {
-                    navHostController.navigate(Screen.ChangeAddress.createRoute(userId ?: ""))
-                },
-                navController = navHostController,userId = userId)
-
+            userId?.let { it1 -> FavoriteScreen(userId = it1,navController =navHostController) }
         }
 
         composable(
@@ -288,7 +295,16 @@ fun HomeNavHost(navHostController: NavHostController, userId: String?) {
         composable(route = Screen.Cart.route,
             arguments = listOf(navArgument("userId") { type = NavType.StringType })) { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId")
-            CartScreen(userId )
+            CartScreen(userId ,navController = navHostController)
+        }
+        composable(route = Screen.CartDetail.route) { backStackEntry ->
+            val restaurantName = backStackEntry.arguments?.getString("restaurantName")
+            CartDetail(restaurantName)
+        }
+        composable(route = Screen.Edit.route,
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId")
+            EditProfileScreen(userId,navController = navHostController)
         }
     }
 }
