@@ -9,19 +9,20 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.admin.screens.LoginAdmin
-import com.example.admin.viewmodel.LogInViewModel
+import com.example.admin.viewmodel.SignInViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
-            val loginViewModel: LogInViewModel = viewModel()
+            val loginViewModel: SignInViewModel = viewModel()
             val context = LocalContext.current
             NavHost(navController, startDestination = Screens.Login) {
                 composable(route = Screens.Login) {
                     LoginAdmin(context,loginViewModel)
                 }
+
             }
 
         }

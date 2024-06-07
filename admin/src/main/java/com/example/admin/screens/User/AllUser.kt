@@ -115,7 +115,6 @@ fun alluserUI(context: Context, userList: SnapshotStateList<User>){
     Column(
         modifier = Modifier
             .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(
             modifier = Modifier
@@ -130,14 +129,14 @@ fun alluserUI(context: Context, userList: SnapshotStateList<User>){
                     modifier = Modifier.size(40.dp)
                 )
             }
-            Spacer(modifier = Modifier.width(55.dp))
+            Spacer(modifier = Modifier.width(75.dp))
             Text(
                 text = "All User", style = TextStyle(
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                 )
             )
-            Spacer(modifier = Modifier.width(55.dp))
+            Spacer(modifier = Modifier.width(75.dp))
             IconButton(onClick = { }) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_add),
@@ -180,6 +179,8 @@ fun alluserUI(context: Context, userList: SnapshotStateList<User>){
                                   contentScale = ContentScale.Crop,
                               )
                             }
+
+                            Spacer(modifier = Modifier.width(15.dp))
                             Column(
                                 modifier = Modifier
                                     .fillMaxSize()

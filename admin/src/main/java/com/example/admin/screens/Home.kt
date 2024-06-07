@@ -26,6 +26,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,32 +45,63 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.admin.R
 import com.example.admin.Screens
+import com.example.admin.model.Order
 import com.example.admin.screens.Category.AllCategory
 import com.example.admin.screens.Menu.MenuRes
+import com.example.admin.screens.Order.OrderManager
 import com.example.admin.screens.Restaurant.AllRestaurant
 import com.example.admin.screens.User.AllUser
 import com.example.admin.ui.theme.blue
-import com.example.admin.ui.theme.box
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
+import kotlinx.coroutines.tasks.await
+import java.text.NumberFormat
+import java.util.Locale
 
 class Home : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            HomeAdminScreen(LocalContext.current,navController = rememberNavController())
+            HomeAdminScreen(LocalContext.current, navController = rememberNavController())
         }
     }
 }
+
 @Composable
-fun HomeAdminScreen(context: Context, navController: NavHostController){
+fun HomeAdminScreen(context: Context, navController: NavHostController) {
     val scrollState = rememberScrollState()
+    val db = FirebaseFirestore.getInstance()
+    val scope = rememberCoroutineScope()
+    val (pendingOrderCount, setPendingOrderCount) = remember { mutableStateOf(0) }
+    val (completedOrderCount, setCompletedOrderCount) = remember { mutableStateOf(0) }
+    val (totalRevenue, setTotalRevenue) = remember { mutableStateOf(0) }
+
+    LaunchedEffect(Unit) {
+        val pendingOrders = db.collection("orders")
+            .whereEqualTo("status", "Processing")
+            .get()
+            .await()
+
+        val completedOrders = db.collection("orders")
+            .whereEqualTo("status", "Delivered")
+            .get()
+            .await()
+
+        val revenue = completedOrders.documents.sumBy { it.toObject<Order>()?.total ?: 0 }
+
+        setPendingOrderCount(pendingOrders.size())
+        setCompletedOrderCount(completedOrders.size())
+        setTotalRevenue(revenue)
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
             .padding(start = 10.dp, end = 10.dp),
         contentAlignment = Alignment.BottomCenter
-    ){
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -76,7 +111,7 @@ fun HomeAdminScreen(context: Context, navController: NavHostController){
         ) {
             Header()
             Spacer(modifier = Modifier.height(30.dp))
-            StatusCardLayout()
+            StatusCardLayout(pendingOrderCount, completedOrderCount, totalRevenue)
             Spacer(modifier = Modifier.height(20.dp))
             Row(
                 modifier = Modifier
@@ -121,9 +156,8 @@ fun HomeAdminScreen(context: Context, navController: NavHostController){
                     cardName = "Items Menu",
                     cardName1 = "Manager",
                     cardIcon = painterResource(id = R.drawable.ic_menu)
-                ) {
-                    context.startActivity(Intent(context, MenuRes::class.java))
-                }
+                ) { context.startActivity(Intent(context, MenuRes::class.java)) }
+
                 EachCardLayout(
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
@@ -133,7 +167,7 @@ fun HomeAdminScreen(context: Context, navController: NavHostController){
                     cardName1 = "Manager",
                     cardIcon = painterResource(id = R.drawable.ic_order)
                 ) {
-
+                    context.startActivity(Intent(context, OrderManager::class.java))
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
@@ -173,7 +207,7 @@ fun HomeAdminScreen(context: Context, navController: NavHostController){
             ) {
                 Card(
                     modifier = Modifier
-                        .clickable {  navController.navigate(Screens.Login) }
+                        .clickable { navController.navigate(Screens.Login) }
                         .fillMaxWidth()
                         .height(50.dp),
                     shape = RoundedCornerShape(16.dp), elevation = CardDefaults.cardElevation(1.dp)
@@ -189,7 +223,6 @@ fun HomeAdminScreen(context: Context, navController: NavHostController){
                             tint = Color.Red,
                             modifier = Modifier.size(30.dp)
                         )
-
                     }
                 }
             }
@@ -199,6 +232,7 @@ fun HomeAdminScreen(context: Context, navController: NavHostController){
     }
 
 }
+
 @Composable
 fun Header() {
     Row(
@@ -227,25 +261,24 @@ fun Header() {
         )
     }
 }
+
 @Composable
-fun StatusCardLayout() {
+fun StatusCardLayout(pendingOrderCount: Int, completedOrderCount: Int, totalRevenue: Int) {
     Card(
         modifier = Modifier
             .fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .background(box),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
-        )
-        {
+        ) {
             CardColumnContent(
                 modifier = Modifier.weight(0.33f),
-                icon= painterResource(id = R.drawable.ic_pending),
+                icon = painterResource(id = R.drawable.ic_pending),
                 centerText = "Pending Order",
-                bottomText = "30"
+                bottomText = pendingOrderCount.toString()
             ) {
 
             }
@@ -253,7 +286,7 @@ fun StatusCardLayout() {
                 modifier = Modifier.weight(0.33f),
                 icon = painterResource(id = R.drawable.ic_complete),
                 centerText = "Completed Order",
-                bottomText = "10"
+                bottomText = completedOrderCount.toString()
             ) {
 
             }
@@ -261,20 +294,27 @@ fun StatusCardLayout() {
                 modifier = Modifier.weight(0.33f),
                 icon = painterResource(id = R.drawable.ic_money),
                 centerText = "Revenue",
-                bottomText = "$100"
+                bottomText = formatCurrency(totalRevenue)
             ) {
 
             }
         }
     }
 }
+
+fun formatCurrency(amount: Int): String {
+    val format = NumberFormat.getCurrencyInstance(Locale("vi", "VN"))
+    return format.format(amount)
+}
+
+
 @Composable
 fun CardColumnContent(
     modifier: Modifier,
     icon: Painter,
     centerText: String,
     bottomText: String,
-    onClick: () -> Unit
+    onClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -290,9 +330,7 @@ fun CardColumnContent(
             contentDescription = "",
             tint = blue
         )
-        Box(modifier=Modifier.height(45.dp),
-
-            ) {
+        Box(modifier = Modifier.height(45.dp)) {
             Text(
                 text = centerText, style = TextStyle(
                     fontSize = 18.sp,
@@ -306,11 +344,11 @@ fun CardColumnContent(
             text = bottomText, style = TextStyle(
                 fontSize = 20.sp,
                 fontWeight = FontWeight.SemiBold,
-
-                )
+            )
         )
     }
 }
+
 @Composable
 fun EachCardLayout(
     modifier: Modifier = Modifier,
@@ -319,7 +357,6 @@ fun EachCardLayout(
     cardIcon: Painter,
     onClick: () -> Unit = {}
 ) {
-
     Card(
         modifier = modifier
             .clickable { onClick() }
@@ -352,7 +389,6 @@ fun EachCardLayout(
                     color = blue
                 )
             )
-
         }
     }
 }

@@ -42,14 +42,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.admin.R
-import com.example.admin.viewmodel.LogInViewModel
+import com.example.admin.viewmodel.SignInViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginAdmin(
     context:Context,
-    logInViewModel: LogInViewModel = viewModel()
+    logInViewModel: SignInViewModel = viewModel()
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }

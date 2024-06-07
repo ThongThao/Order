@@ -14,4 +14,10 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_all_user">AllUser</string>
     <string name="title_activity_update_item">UpdateItem</string>
+    <string name="title_activity_order_manager">OrderManager</string>
+    <string name="title_activity_order_pending">OrderPending</string>
+    <string name="title_activity_order_shipping">OrderShipping</string>
+    <string name="title_activity_order_cancelled">OrderCancelled</string>
+    <string name="title_activity_order_confirmed">OrderConfirmed</string>
+    <string name="title_activity_order_completed">OrderCompleted</string>
 </resources>

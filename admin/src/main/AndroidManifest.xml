@@ -13,6 +13,36 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Order">
         <activity
+            android:name=".screens.Order.OrderCompleted"
+            android:exported="false"
+            android:label="@string/title_activity_order_completed"
+            android:theme="@style/Theme.Order" />
+        <activity
+            android:name=".screens.Order.OrderConfirmed"
+            android:exported="false"
+            android:label="@string/title_activity_order_confirmed"
+            android:theme="@style/Theme.Order" />
+        <activity
+            android:name=".screens.Order.OrderCancelled"
+            android:exported="false"
+            android:label="@string/title_activity_order_cancelled"
+            android:theme="@style/Theme.Order" />
+        <activity
+            android:name=".screens.Order.OrderShipping"
+            android:exported="false"
+            android:label="@string/title_activity_order_shipping"
+            android:theme="@style/Theme.Order" />
+        <activity
+            android:name=".screens.Order.OrderPending"
+            android:exported="false"
+            android:label="@string/title_activity_order_pending"
+            android:theme="@style/Theme.Order" />
+        <activity
+            android:name=".screens.Order.OrderManager"
+            android:exported="false"
+            android:label="@string/title_activity_order_manager"
+            android:theme="@style/Theme.Order" />
+        <activity
             android:name=".screens.Menu.UpdateItem"
             android:exported="false"
             android:label="@string/title_activity_update_item"
@@ -31,7 +61,7 @@
             android:name=".screens.Menu.AddItem"
             android:exported="true"
             android:label="@string/title_activity_add_item"
-            android:theme="@style/Theme.Order"></activity>
+            android:theme="@style/Theme.Order" />
         <activity
             android:name=".screens.Menu.MenuRes"
             android:exported="false"

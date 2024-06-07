@@ -1,3 +1,5 @@
+package com.example.admin.model
+
 @kotlinx.serialization.Serializable
 enum class OrderStatus(code: String)  {
     Processing("Processing"),

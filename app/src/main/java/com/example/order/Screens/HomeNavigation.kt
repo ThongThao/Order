@@ -3,6 +3,7 @@ package com.example.order.Screens
 import CartDetail
 import CartScreen
 import EditProfileScreen
+import OrderDetail
 import SignInScreen
 import android.annotation.SuppressLint
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -202,18 +203,8 @@ fun HomeNavHost(navHostController: NavHostController, userId: String?) {
         }
 
         composable(
-            route = HomeScreens.LIST.name,
-        ) {
-            val homeViewModel: HomeViewModel = viewModel()
-            HomeScreen(homeViewModel,
-                navToRes = {
-                    navHostController.navigate(Screen.Restaurant.createRoute(userId ?: ""))
-                },
-                navToCart={},
-                navToChangeAddress = {
-                    navHostController.navigate(Screen.ChangeAddress.createRoute(userId ?: ""))
-                },
-                navController = navHostController,userId = userId)
+            route = HomeScreens.LIST.name,  ){
+           OrderScreen(userId, navController = navHostController)
         }
 
         composable(
@@ -308,6 +299,16 @@ fun HomeNavHost(navHostController: NavHostController, userId: String?) {
             arguments = listOf(navArgument("userId") { type = NavType.StringType })) { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId")
             EditProfileScreen(userId,navController = navHostController)
+        }
+        composable(
+            "order_detail/{orderId}",
+            arguments = listOf(navArgument("orderId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getString("orderId") ?: return@composable
+            OrderDetail(
+                orderId = orderId,
+                navController = navHostController
+            )
         }
     }
 }

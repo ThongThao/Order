@@ -1,5 +1,6 @@
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.order.model.Order
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,7 +35,7 @@ class CartViewModel : ViewModel() {
             }
 
             // Calculate the updated total
-            val updatedTotal = updatedItems.sumBy { it?.price?.times(it.quantity!!) ?: 0 }
+            val updatedTotal = updatedItems.filterNotNull().sumBy { (it.price ?: 0) * (it.quantity ?: 0) }
 
             // Create updated RestaurantCart
             val updatedRestaurantCart = existingRestaurantCart.copy(items = updatedItems, total = updatedTotal)
@@ -89,6 +90,45 @@ class CartViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 // Handle exception
+            }
+        }
+    }
+    fun placeOrder(order: Order, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val newOrderRef = db.collection("orders").document()
+                order.id = newOrderRef.id
+                newOrderRef.set(order).addOnSuccessListener {
+                    onSuccess()
+                }.addOnFailureListener { exception ->
+                    onFailure(exception)
+                }
+            } catch (e: Exception) {
+                onFailure(e)
+            }
+        }
+    }
+
+    fun removeRestaurantCart(userId: String, restaurantName: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val cartRef = db.collection("carts").document(userId)
+                db.runTransaction { transaction ->
+                    val snapshot = transaction.get(cartRef)
+                    val cart = snapshot.toObject(Cart::class.java)
+                    if (cart != null && cart.restaurantCarts != null) {
+                        val updatedRestaurantCarts = cart.restaurantCarts.toMutableMap()
+                        updatedRestaurantCarts.remove(restaurantName)
+                        val updatedCart = cart.copy(restaurantCarts = updatedRestaurantCarts)
+                        transaction.set(cartRef, updatedCart)
+                    }
+                }.addOnSuccessListener {
+                    onSuccess()
+                }.addOnFailureListener { exception ->
+                    onFailure(exception)
+                }
+            } catch (e: Exception) {
+                onFailure(e)
             }
         }
     }

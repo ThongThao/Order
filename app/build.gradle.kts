@@ -72,7 +72,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation ("org.mindrot:jbcrypt:0.4")
     implementation("androidx.compose.runtime:runtime-livedata:1.7.0-alpha01")
-
+    implementation( "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.4.0")
     testImplementation(libs.junit)
     implementation("io.coil-kt:coil-compose:2.6.0")
     androidTestImplementation(libs.androidx.junit)

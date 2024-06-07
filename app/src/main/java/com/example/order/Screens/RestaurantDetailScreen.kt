@@ -283,11 +283,15 @@ fun RestaurantDetailScreen(
                                             note = note
                                         )
                                     }
-
                                     val restaurantCart = RestaurantCart(
                                         restaurantName = restaurantName ?: "",
                                         items = listOf(cartItem),
-                                        total = 0
+                                        total = cartItem?.quantity?.let { it1 ->
+                                            cartItem?.price?.times(
+                                                it1
+                                            )
+                                        }
+                                            ?: 0
                                     )
 
                                     // Update the local cart state

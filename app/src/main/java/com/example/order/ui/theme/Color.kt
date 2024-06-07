@@ -20,4 +20,5 @@ val red = Color(0xFFDD4B39)
 val black = Color(0xFF000000)
 val white = Color(0xFFFFFFFF)
 val yellow=Color(0xFFFD9C6B)
-
+val yellow1=Color(0xFFE2B9E9)
+val lightGray = Color(0xFFF7F7F7)
