@@ -20,4 +20,5 @@
     <string name="title_activity_order_cancelled">OrderCancelled</string>
     <string name="title_activity_order_confirmed">OrderConfirmed</string>
     <string name="title_activity_order_completed">OrderCompleted</string>
+    <string name="title_activity_order_detail">OrderDetail</string>
 </resources>

@@ -13,6 +13,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Order">
         <activity
+            android:name=".screens.Order.OrderDetail"
+            android:exported="false"
+            android:label="@string/title_activity_order_detail"
+            android:theme="@style/Theme.Order" />
+        <activity
             android:name=".screens.Order.OrderCompleted"
             android:exported="false"
             android:label="@string/title_activity_order_completed"
