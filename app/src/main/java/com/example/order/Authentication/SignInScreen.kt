@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -36,7 +35,6 @@ import com.example.order.model.User
 import com.example.order.ui.theme.OrderTheme
 import com.example.order.ui.theme.blue
 import com.example.order.ui.theme.metropolisFontFamily
-import com.example.order.ui.theme.orange
 import com.example.order.ui.theme.primaryFontColor
 import com.example.order.ui.theme.red
 import com.example.order.ui.theme.secondaryFontColor
@@ -89,20 +87,6 @@ fun SignInScreen(
             Spacer(modifier = Modifier.height(28.dp))
             AppTextField(hint = "Mật khẩu", keyboardType = KeyboardType.Password) { value ->
                 password = value // Cập nhật biến password
-            }
-            TextButton(onClick = {
-                // Handle forgot password
-            }) {
-                Text(
-                    "Quên mật khẩu?",
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        color = orange,
-                        fontFamily = metropolisFontFamily,
-                        fontWeight = FontWeight.Medium
-                    ),
-                    modifier = Modifier.padding(start = 200.dp)
-                )
             }
             Spacer(modifier = Modifier.height(10.dp))
             errorMessage?.let { message ->

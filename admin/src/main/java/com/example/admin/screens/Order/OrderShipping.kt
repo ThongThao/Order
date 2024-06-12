@@ -262,10 +262,10 @@ fun IconRowWithDashedLine(context: Context,status: String?, orderId: String) {
 
         IconButton(
             onClick = {
-                updateOrderStatus(orderId ?: "", OrderStatus.Delivered)
+                updateOrderStatus(orderId ?: "", OrderStatus.Shipped)
                 context.startActivity(Intent(context, OrderShipping::class.java))
             },
-            enabled = status == "Shipped", // Enable button only if status is "Shipped"
+            enabled = status == "Shipping", // Enable button only if status is "Shipped"
             modifier = Modifier.size(50.dp)
         ) {
             Icon(

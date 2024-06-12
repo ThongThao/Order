@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -38,6 +37,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -74,6 +74,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.app.R
 import com.example.order.FilledButton
 import com.example.order.model.Menu
+import com.example.order.navigation.Screen
 import com.example.order.ui.theme.blue2
 import com.example.order.ui.theme.blue3
 import com.example.order.ui.theme.gray
@@ -141,11 +142,11 @@ fun RestaurantDetailScreen(
                         menuItem.itemImage?.let {
                             Image(
                                 painter = rememberAsyncImagePainter(it),
-                                contentScale = ContentScale.Crop,
                                 contentDescription = null,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(200.dp)
+
                             )
                         }
                         Row(
@@ -327,253 +328,311 @@ fun RestaurantDetailScreen(
                 }
             }
         ) {
-                restaurant?.let {  restaurant->
+                restaurant?.let { restaurant ->
+                    Column {
+                        Row(
+                            modifier = Modifier
+                                .padding(5.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                    ) {
-
-                        restaurant.restaurantImage?.let {
                             Box(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(270.dp)
+                                    .size(40.dp)
+                                    .clip(shape = CircleShape)
+                                    .background(color = Color.White)
                             ) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(it),
-                                    contentScale = ContentScale.Crop,
-                                    contentDescription = null,
-                                    modifier = Modifier.matchParentSize()
-                                )
-                                Box(
-                                    modifier = Modifier
-                                        .matchParentSize()
-                                        .background(Color.Black.copy(alpha = 0.5f)) // Độ trong suốt của màu đen
-                                )
-                            }
-                        }
 
-                    }
-                    Row (modifier = Modifier
-                        .padding(10.dp)
-                        .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
-
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(shape = CircleShape)
-                                .background(color = Color.White)
-                        ) {
-
-                            IconButton(onClick = { navController.popBackStack() }) {
-                                Icon(
-                                    imageVector = Icons.Default.ArrowBack,
-                                    contentDescription = "Back",
-                                    tint= orange
-                                )
-                            }
-                        }
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(shape = CircleShape)
-                                .background(color = Color.White),
-                        ) {
-
-                            IconButton(onClick = { navController.popBackStack() }) {
-                                Icon(
-                                    imageVector = Icons.Default.Info,
-                                    contentDescription = "Back",
-                                    tint= orange
-                                )
-                            }
-                        }
-
-                    }
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = 300.dp),
-                        color = Color.White,
-                    ) {
-                        Column() {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Thực đơn",
-                                    fontSize = 26.sp,
-                                    color = Color.Black,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(
-                                        vertical = 4.dp,
-                                        horizontal = 12.dp
+                                IconButton(onClick = { navController.popBackStack() }) {
+                                    Icon(
+                                        imageVector = Icons.Default.ArrowBack,
+                                        contentDescription = "Back",
+                                        tint = orange
                                     )
-                                )
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .height(4.dp)
-                                        .padding(top = 2.dp)
-                                        .background(Color.LightGray)
-                                )
+                                }
                             }
-                            Spacer(modifier = Modifier.height(10.dp))
-                            restaurant?.restaurantName?.let { restaurantName ->
-                                val menus by menuViewModel.getMenusForRestaurant(restaurantName)
-                                    .collectAsState(initial = emptyList())
-                                LazyColumn(
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(shape = CircleShape)
+                                    .background(color = Color.White),
+                            ) {
+
+                                IconButton(onClick = {
+                                    navController.navigate(Screen.Cart.createRoute(userId!!))
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.ShoppingCart,
+                                        contentDescription = "Back",
+                                        tint = orange
+                                    )
+                                }
+                            }
+
+                        }
+
+                    LazyColumn {
+                        item {
+
+                            Box {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
                                 ) {
-                                    itemsIndexed(menus) { _, menuItem ->
-                                        Row(
-                                            modifier = Modifier
-                                                .padding(8.dp)
-                                                .clickable {
-                                                    selectedMenuItem.value = menuItem
-                                                    coroutineScope.launch { bottomSheetState.show() }
-                                                },
-                                        ) {
-                                            Surface(
-                                                shape = RoundedCornerShape(12.dp),
-                                                modifier = Modifier
-                                                    .size(120.dp, 120.dp)
-                                                    .border(
-                                                        width = 2.dp,
-                                                        color = Color.White,
-                                                        shape = RoundedCornerShape(12.dp)
-                                                    )
-                                            ) {
-                                                menuItem.itemImage?.let {
-                                                    Image(
-                                                        painter = rememberAsyncImagePainter(it),
-                                                        contentScale = ContentScale.Crop,
-                                                        contentDescription = null
-                                                    )
-                                                }
-                                            }
-                                            Spacer(modifier = Modifier.width(10.dp))
-                                            Column {
-                                                Spacer(modifier = Modifier.height(4.dp))
-                                                menuItem.itemName?.let {
-                                                    androidx.compose.material.Text(
-                                                        text = it,
-                                                        fontSize = 24.sp,
-                                                        color = primaryFontColor,
-                                                        fontWeight = FontWeight.Normal
-                                                    )
-                                                }
-                                                Spacer(modifier = Modifier.height(4.dp))
-                                                menuItem.itemDescription?.let {
-                                                    androidx.compose.material.Text(
-                                                        text = it,
-                                                        fontSize = 18.sp,
-                                                        color = Color.Gray,
-                                                        fontWeight = FontWeight.Normal
-                                                    )
-                                                }
-                                                Spacer(modifier = Modifier.height(18.dp))
-                                                menuItem.itemPrice?.let {
-                                                    val formattedPrice =
-                                                        NumberFormat.getCurrencyInstance(Locale("vi", "VN"))
-                                                            .format(it)
-                                                    Text(
-                                                        text = formattedPrice,
-                                                        fontSize = 24.sp,
-                                                        color = primaryFontColor,
-                                                        fontWeight = FontWeight.Bold
-                                                    )
-                                                }
-                                            }
-                                            Box(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                contentAlignment = Alignment.CenterEnd
-                                            ) {
-                                                IconButton(
-                                                    onClick = { },
-                                                    modifier = Modifier.size(50.dp)
-                                                ) {
-                                                    Icon(
-                                                        imageVector = Icons.Default.AddCircle,
-                                                        contentDescription = null,
-                                                        modifier = Modifier.size(50.dp),
-                                                        tint = blue3
-                                                    )
-                                                }
-                                            }
-                                        }
+
+                                    restaurant.restaurantImage?.let {
                                         Box(
                                             modifier = Modifier
                                                 .fillMaxWidth()
+                                                .height(270.dp)
+                                        ) {
+                                            Image(
+                                                painter = rememberAsyncImagePainter(it),
+                                                contentScale = ContentScale.Crop,
+                                                contentDescription = null,
+                                                modifier = Modifier.matchParentSize()
+                                            )
+                                            Box(
+                                                modifier = Modifier
+                                                    .matchParentSize()
+                                                    .background(Color.Black.copy(alpha = 0.6f)) // Độ trong suốt của màu đen
+                                            )
+                                        }
+                                    }
+
+                                }
+                                Column(
+                                    modifier = Modifier
+                                        .padding(5.dp)
+                                        .fillMaxWidth(),
+                                ) {
+                                    Box(modifier = Modifier.fillMaxWidth(),
+                                        contentAlignment = Alignment.BottomEnd) {
+                                        Column {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(40.dp)
+                                                    .clip(shape = CircleShape)
+                                                    .background(color = Color.White),
+
+                                                ) {
+
+                                                IconButton(onClick = { navController.popBackStack() }) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Info,
+                                                        contentDescription = "Back",
+                                                        tint = orange,
+                                                        modifier= Modifier.size(30.dp)
+                                                    )
+                                                }
+                                            }
+                                            Spacer(modifier = Modifier.height(5.dp))
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(40.dp)
+                                                    .clip(shape = CircleShape)
+                                                    .background(color = Color.White),
+
+                                                ) {
+
+                                                user!!.id?.let { userId ->
+                                                    restaurant.restaurantId?.let { restaurantId ->
+                                                        FavoriteButton(
+                                                            userId = userId,
+                                                            restaurantId = restaurantId,
+                                                            favoriteViewModel = favoriteViewModel
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.height(105.dp))
+                                    Column() {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
+                                        ) {
+                                            restaurant.restaurantName?.let {
+                                                Text(
+                                                    text = it,
+                                                    fontSize = 30.sp,
+                                                    style = MaterialTheme.typography.titleSmall,
+                                                    modifier = Modifier.padding(
+                                                        start = 8.dp
+                                                    ),
+                                                    color = Color.White
+                                                )
+                                            }
+
+                                        }
+                                        Row(verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.clickable { }) {
+                                            Icon(
+                                                imageVector = Icons.Default.Star,
+                                                contentDescription = " ",
+                                                modifier = Modifier.padding(
+                                                    start = 8.dp
+                                                ),
+                                                tint = Color.Yellow
+                                            )
+
+                                            Text(
+                                                text = "${restaurant.restaurantRate}" + " | Đánh giá",
+                                                modifier = Modifier.padding(bottom = 3.dp),
+                                                fontSize = 20.sp,
+                                                color = Color.White
+                                            )
+                                        }
+
+                                    }
+
+                                }
+                            }
+
+                            Surface(
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                color = Color.White,
+                            ) {
+                                Column() {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Thực đơn",
+                                            fontSize = 26.sp,
+                                            color = Color.Black,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(
+                                                vertical = 4.dp,
+                                                horizontal = 12.dp
+                                            )
+                                        )
+                                        Box(
+                                            modifier = Modifier
+                                                .weight(1f)
                                                 .height(4.dp)
                                                 .padding(top = 2.dp)
                                                 .background(Color.LightGray)
                                         )
                                     }
+                                    Spacer(modifier = Modifier.height(10.dp))
+                                    restaurant?.restaurantName?.let { restaurantName ->
+                                        val menus by menuViewModel.getMenusForRestaurant(
+                                            restaurantName
+                                        )
+                                            .collectAsState(initial = emptyList())
+                                        menus.forEach { menuItem ->
+                                            Surface(
+                                                shape = RoundedCornerShape(17.dp),
+                                                color = Color.White,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(vertical = 2.dp, horizontal = 2.dp)
+                                                    .padding(start = 5.dp, end = 5.dp)
+                                                    .background(
+                                                        color = blue3,
+                                                        shape = RoundedCornerShape(17.dp)
+                                                    )
+                                                    .clickable {
+                                                        selectedMenuItem.value = menuItem
+                                                        coroutineScope.launch { bottomSheetState.show() }
+                                                    }
+                                                    .padding(bottom = 1.dp),
+                                                shadowElevation = 5.dp
+
+                                            ) {
+
+                                            Row(
+                                                modifier = Modifier
+                                                    .padding(8.dp)
+
+                                            ) {
+                                                Surface(
+                                                    shape = RoundedCornerShape(12.dp),
+                                                    modifier = Modifier
+                                                        .size(120.dp, 120.dp)
+                                                        .border(
+                                                            width = 2.dp,
+                                                            color = Color.White,
+                                                            shape = RoundedCornerShape(12.dp)
+                                                        )
+                                                ) {
+                                                    menuItem.itemImage?.let {
+                                                        Image(
+                                                            painter = rememberAsyncImagePainter(
+                                                                it
+                                                            ),
+                                                            contentScale = ContentScale.Crop,
+                                                            contentDescription = null
+                                                        )
+                                                    }
+                                                }
+                                                Spacer(modifier = Modifier.width(10.dp))
+                                                Column {
+                                                    Spacer(modifier = Modifier.height(4.dp))
+                                                    menuItem.itemName?.let {
+                                                        androidx.compose.material.Text(
+                                                            text = it,
+                                                            fontSize = 24.sp,
+                                                            color = primaryFontColor,
+                                                            fontWeight = FontWeight.Normal
+                                                        )
+                                                    }
+                                                    Spacer(modifier = Modifier.height(4.dp))
+                                                    menuItem.itemDescription?.let {
+                                                        androidx.compose.material.Text(
+                                                            text = it,
+                                                            fontSize = 18.sp,
+                                                            color = Color.Gray,
+                                                            fontWeight = FontWeight.Normal
+                                                        )
+                                                    }
+                                                    Spacer(modifier = Modifier.height(18.dp))
+                                                    menuItem.itemPrice?.let {
+                                                        val formattedPrice =
+                                                            NumberFormat.getCurrencyInstance(
+                                                                Locale(
+                                                                    "vi",
+                                                                    "VN"
+                                                                )
+                                                            )
+                                                                .format(it)
+                                                        Text(
+                                                            text = formattedPrice,
+                                                            fontSize = 24.sp,
+                                                            color = primaryFontColor,
+                                                            fontWeight = FontWeight.Bold
+                                                        )
+                                                    }
+                                                }
+                                                Box(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    contentAlignment = Alignment.CenterEnd
+                                                ) {
+                                                    IconButton(
+                                                        onClick = { },
+                                                        modifier = Modifier.size(50.dp)
+                                                    ) {
+                                                        Icon(
+                                                            imageVector = Icons.Default.AddCircle,
+                                                            contentDescription = null,
+                                                            modifier = Modifier.size(50.dp),
+                                                            tint = blue3
+                                                        )
+                                                    }
+                                                }
+                                              }
+                                            }
+
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(270.dp),
-                            contentAlignment = Alignment.BottomStart
-                        ) {
-                            Column() {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
-                                ) {
-                                    restaurant.restaurantName?.let {
-                                        Text(
-                                            text = it,
-                                            fontSize = 30.sp,
-                                            style = MaterialTheme.typography.titleSmall,
-                                            modifier = Modifier.padding(start = 8.dp
-                                            ),
-                                            color = Color.White
-                                        )
-                                    }
-                                    user!!.id?.let { userId ->
-                                        restaurant.restaurantId?.let { restaurantId ->
-                                            FavoriteButton(
-                                                userId = userId,
-                                                restaurantId = restaurantId,
-                                                favoriteViewModel = favoriteViewModel
-                                            )
-                                        }
-                                    }
-                                }
-                                Row (verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.clickable {  }){
-                                    Icon(
-                                        imageVector = Icons.Default.Star,
-                                        contentDescription =" ",
-                                        modifier = Modifier.padding(
-                                            start = 8.dp
-                                        ),
-                                        tint = Color.Yellow
-                                    )
-
-                                    Text(
-                                        text = "${restaurant.restaurantRate}" + " | Đánh giá",
-                                        modifier = Modifier.padding(bottom = 3.dp),
-                                        fontSize = 20.sp,
-                                        color = Color.White
-                                    )
-                                }
-                            }
-                        }
-
-
-
-
                     }
 
                 }

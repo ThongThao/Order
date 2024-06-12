@@ -67,7 +67,6 @@ import com.example.order.ui.theme.placeholderColor
 import com.example.order.ui.theme.primaryFontColor
 import com.example.order.ui.theme.secondaryFontColor
 import com.example.order.ui.theme.white
-import com.example.order.viewmodels.ResetPasswordViewModel
 import kotlinx.coroutines.launch
 
 
@@ -378,26 +377,6 @@ fun VTextFiled(
     )
 }
 
-@Composable
-fun VerifyTextField(viewModel: ResetPasswordViewModel, codeLength: Int = 4) {
-    Row(
-        modifier = Modifier.padding(horizontal = 28.dp),
-        horizontalArrangement = Arrangement.spacedBy(28.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        for (i in 0..codeLength - 2) {
-            VTextFiled(
-                value = viewModel.verificationCodeValue(i),
-                onValueChanged = { viewModel.onVerificationCodeChanged(it,index =  i) }
-            )
-        }
-        VTextFiled(
-            action = ImeAction.Done,
-            value = viewModel.verificationCodeValue(codeLength - 1),
-            onValueChanged = { viewModel.onVerificationCodeChanged(it, index = codeLength - 1) }
-        )
-    }
-}
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
