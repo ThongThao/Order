@@ -42,6 +42,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.app.R
 import com.example.order.navigation.Screen
+import com.example.order.screens.RateRestaurantScreen
 import com.example.order.ui.theme.metropolisFontFamily
 import com.example.order.ui.theme.orange
 import com.example.order.ui.theme.placeholderColor
@@ -302,6 +303,11 @@ fun HomeNavHost(navHostController: NavHostController, userId: String?) {
                 userId,
 
             )
+        }
+        composable(route = "rating_detail/{restaurantName}",
+            arguments = listOf( navArgument("restaurantName"){ type = NavType.StringType })) { backStackEntry ->
+            val restaurantName = backStackEntry.arguments?.getString("restaurantName")
+           RateRestaurantScreen(restaurantName!!, navController =navHostController )
         }
         composable(Screen.OrderHistory.route,arguments = listOf(navArgument("userId") { type = NavType.StringType })
         ) { backStackEntry ->

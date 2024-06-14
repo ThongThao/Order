@@ -18,6 +18,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,6 +38,7 @@ import com.example.order.ui.theme.orange1
 import com.example.order.ui.theme.red
 import com.example.order.ui.theme.white
 import com.example.order.viewmodel.RatingViewModel
+import com.example.order.viewmodels.UserViewModel
 import java.util.Date
 import java.util.UUID
 
@@ -45,11 +47,12 @@ fun RatingAndComment(
     userId: String?,
     restaurantName: String?,
     navController: NavController,
-    ratingViewModel: RatingViewModel = viewModel()
+    ratingViewModel: RatingViewModel = viewModel(),
+    userViewModel: UserViewModel = viewModel()
 ) {
     var rating by remember { mutableStateOf(0.0) }
     var comment by remember { mutableStateOf("") }
-
+    val user by userViewModel.getUser(userId).observeAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -93,6 +96,7 @@ fun RatingAndComment(
                 val rate = Rate(
                     id = UUID.randomUUID().toString(),
                     customerId = userId,
+                    customerName = user?.fullName,
                     restaurantName = restaurantName,
                     rating = rating,
                     comment = comment,

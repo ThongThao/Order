@@ -363,7 +363,7 @@ fun OrderDetail(navController: NavController, orderId: String, userId:String?,
                                 Button(
                                     onClick = {
                                         updateOrderStatus(orderDetail?.id ?: "", OrderStatus.Delivered)
-                                        navController.navigate("order_detail/$userId/${orderDetail?.id}")
+                                        navController.navigate("rating/${userId!!}/${orderDetail!!.restaurant}")
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth()

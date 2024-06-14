@@ -468,7 +468,9 @@ fun RestaurantDetailScreen(
 
                                         }
                                         Row(verticalAlignment = Alignment.CenterVertically,
-                                            modifier = Modifier.clickable { }) {
+                                            modifier = Modifier.clickable {
+                                                navController.navigate("rating_detail/${restaurant.restaurantName}")
+                                            }) {
                                             Icon(
                                                 imageVector = Icons.Default.Star,
                                                 contentDescription = " ",

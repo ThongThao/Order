@@ -5,22 +5,24 @@ import androidx.lifecycle.viewModelScope
 import com.example.order.model.Rate
 import com.example.order.model.Restaurant
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class RatingViewModel : ViewModel() {
 
     private val db = FirebaseFirestore.getInstance()
 
+    private val _ratings = MutableStateFlow<List<Rate>>(emptyList())
+    val ratings: StateFlow<List<Rate>> get() = _ratings
+
     fun submitRating(rate: Rate, restaurantName: String) {
         viewModelScope.launch {
-            // Save the rating to Firestore
             val docRef = db.collection("ratings").document()
-            rate.id = docRef.id // Assigning the ID to the rate object
+            rate.id = docRef.id
             docRef.set(rate)
                 .addOnSuccessListener {
-                    // Update the restaurant rating
                     updateRestaurantRating(restaurantName, rate.rating)
-
                 }
                 .addOnFailureListener { e ->
                     // Handle the error
@@ -41,7 +43,6 @@ class RatingViewModel : ViewModel() {
                         val snapshot = transaction.get(restaurantRef)
                         val restaurant = snapshot.toObject(Restaurant::class.java)
                         if (restaurant != null) {
-                            if (restaurant != null) {
                             val currentRating = restaurant.restaurantRate ?: 0.0
                             val newRestaurantRate = if (currentRating == 0.0) {
                                 newRating
@@ -50,7 +51,6 @@ class RatingViewModel : ViewModel() {
                             }
                             transaction.update(restaurantRef, "restaurantRate", newRestaurantRate)
                         }
-                            }
                     }.addOnSuccessListener {
                         updateRatingCount(restaurantName)
                     }.addOnFailureListener { e ->
@@ -62,6 +62,7 @@ class RatingViewModel : ViewModel() {
                 // Handle the error
             }
     }
+
     private fun updateRatingCount(restaurantName: String) {
         db.collection("ratings")
             .whereEqualTo("restaurantName", restaurantName)
@@ -90,5 +91,20 @@ class RatingViewModel : ViewModel() {
             .addOnFailureListener { e ->
                 // Handle error
             }
+    }
+
+    fun getRatingsForRestaurant(restaurantName: String) {
+        viewModelScope.launch {
+            db.collection("ratings")
+                .whereEqualTo("restaurantName", restaurantName)
+                .get()
+                .addOnSuccessListener { documents ->
+                    val ratingsList = documents.map { it.toObject(Rate::class.java) }
+                    _ratings.value = ratingsList
+                }
+                .addOnFailureListener { e ->
+                    // Handle error
+                }
+        }
     }
 }
