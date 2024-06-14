@@ -3,49 +3,54 @@ package com.example.admin.screens.Category
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.admin.R
 import com.example.admin.model.Category
 import com.example.admin.screens.SelectItemImageSection
 import com.example.admin.ui.theme.OrderTheme
 import com.example.admin.ui.theme.blue
+import com.example.admin.ui.theme.blueColor
 import com.example.admin.ui.theme.grayFont
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -54,45 +59,50 @@ import java.util.UUID
 
 class AddCategory : ComponentActivity() {
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             OrderTheme {
                 // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(top = 10.dp),
-                    ) {
-                        IconButton(onClick = { /*TODO*/ }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_back),
-                                contentDescription = "",
-                                tint = blue,
-                                modifier = Modifier.size(40.dp)
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(60.dp))
-                        Text(
-                            text = "Add Category", style = TextStyle(
-                                fontSize = 30.sp,
-                                fontWeight = FontWeight.Bold,
-                            )
+                Scaffold(
+                    topBar = {
+                        CenterAlignedTopAppBar(
+                            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                                containerColor = blueColor,
+                                titleContentColor = Color.White,
+                                navigationIconContentColor = Color.White,
+                                actionIconContentColor = Color.White
+                            ),
+                            title = {
+                                Text(
+                                    text = "Add Category",
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            navigationIcon = {
+                                IconButton(onClick = {this@AddCategory.startActivity(Intent(this@AddCategory, AllCategory::class.java))  }) {
+                                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+                                }
+                            }
                         )
                     }
-                }
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(0.dp, 50.dp, 0.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ){
-
-                    addUI(LocalContext.current)
-
+                ) { paddingValues ->
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            addUI(LocalContext.current)
+                        }
+                    }
                 }
             }
         }
@@ -101,78 +111,87 @@ class AddCategory : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun addUI(context: Context){
-    val categoryName = remember {
-        mutableStateOf("")
-    }
-    val categoryImage = remember {
-        mutableStateOf("")
+    var expanded by remember { mutableStateOf(false) }
+
+    val categoryName = remember { mutableStateOf("") }
+    val categoryImage = remember { mutableStateOf("") }
+
+
+    TextButton(onClick = {
+        context.startActivity(Intent(context, AllCategory::class.java))
+    }) {
+        Text(
+            text = "All Category",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = blueColor,
+        )
+        Icon(
+            imageVector = Icons.Default.Menu,
+            contentDescription = null,
+            tint = blueColor
+        )
     }
 
     Column(
-        modifier = Modifier
-//            .fillMaxSize()
-            .padding(40.dp),
+        modifier = Modifier.padding(40.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-//        verticalArrangement = Arrangement.Center
     ) {
-
+        SelectItemImageSection { imageUrl ->
+            categoryImage.value = imageUrl
+        }
+        Spacer(modifier = Modifier.size(7.dp))
         OutlinedTextField(
             value = categoryName.value,
             onValueChange = { categoryName.value = it },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(62.dp),
+                .height(59.dp),
             shape = RoundedCornerShape(10.dp),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             singleLine = true,
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 containerColor = Color.White,
-                focusedBorderColor = blue,
-                unfocusedBorderColor = Color.LightGray
+                focusedBorderColor = blueColor,
+                unfocusedBorderColor = blue
             ),
-            label = { Text(text = "Name", color = grayFont)}
+            label = { Text(text = "Category Name", color = grayFont) }
         )
 
-        Spacer(modifier = Modifier.size(7.dp))
-        SelectItemImageSection{
-                imageUrl -> categoryImage.value = imageUrl // Assign the URL to the mutableState variable
-
-        }
-        Spacer(modifier = Modifier.size(30.dp))
+        Spacer(modifier = Modifier.size(20.dp))
         Button(
             onClick = {
-                addCategory(categoryName.value,categoryImage.value, context)
+                when {
+                    TextUtils.isEmpty(categoryName.value) -> {
+                        Toast.makeText(context, "Please enter the product name", Toast.LENGTH_SHORT).show()
+                    }
+                    else -> {
+                        addCategory(
+                            categoryName.value,
+                            categoryImage.value,
+                            context
+                        )
+                        context.startActivity(Intent(context, AllCategory::class.java))
+                    }
+                }
             },
+
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(20.dp),
             elevation = ButtonDefaults.buttonElevation(
                 defaultElevation = 3.dp,
                 pressedElevation = 6.dp
             ),
             colors = ButtonDefaults.buttonColors(
-                containerColor = blue
-            ),
-//                border = BorderStroke(0.5.dp, Color.Red)
-        ) {
-            Text(text = "ADD", fontWeight = FontWeight.Bold,fontSize = 18.sp)
-        }
-        Spacer(modifier = Modifier.size(30.dp))
-        TextButton(onClick = {
-            context.startActivity(Intent(context, AllCategory::class.java))
-        },
-        ) {
-            Text(
-                text = "View all category",
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Red,
+                containerColor = blueColor
             )
+        ) {
+            Text(text = "Add", fontWeight = FontWeight.Bold, fontSize = 18.sp)
         }
     }
 }
-
 
 fun addCategory(
     categoryName: String,

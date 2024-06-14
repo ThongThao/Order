@@ -479,7 +479,7 @@ fun RestaurantDetailScreen(
                                             )
 
                                             Text(
-                                                text = "${restaurant.restaurantRate}" + " | Đánh giá",
+                                                text = "${restaurant.restaurantRate}" + " |${restaurant.ratingCount} Đánh giá",
                                                 modifier = Modifier.padding(bottom = 3.dp),
                                                 fontSize = 20.sp,
                                                 color = Color.White

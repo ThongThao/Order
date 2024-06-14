@@ -6,6 +6,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -17,16 +18,20 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FabPosition
 import androidx.compose.material.Icon
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.rounded.DateRange
 import androidx.compose.material.icons.rounded.KeyboardArrowRight
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,14 +58,14 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OrderScreen(
+fun OrderHistory(
     userId:String?,
     orderViewModel: OrderViewModel = viewModel(),
     navController: NavHostController
 ) {
-    val orders by orderViewModel.orders.collectAsState()
+    val orders1 by orderViewModel.orders1.collectAsState()
     LaunchedEffect(userId) {
-        userId?.let { orderViewModel.fetchOrdersForUser(it) }
+        userId?.let { orderViewModel.fetchOrdersForUser1(it) }
     }
 
     androidx.compose.material.Scaffold(
@@ -77,14 +82,31 @@ fun OrderScreen(
                 ),
                 title = {
                     Text(
-                        text = "Đơn hàng",
-                        maxLines = 1,
+                        text = "Lịch sử",
+                        fontSize = 24.sp,
                         overflow = TextOverflow.Ellipsis,
                         fontWeight = FontWeight.Bold
                     )
                 },
+                navigationIcon = {
+                    Button(
+                        onClick = { navController.popBackStack()},
+                        contentPadding = PaddingValues(),
+                        shape = Shapes.small,
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.White,
+                            contentColor = Color.Black
+                        ),
+                        //                    elevation = 5.dp,
+                        modifier = Modifier
+                            .width(38.dp)
+                            .height(38.dp)
+                    ) {
+                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription ="" )
+                    }
+                },
 
-            )
+                )
         },
 
         content = { innerPadding ->
@@ -94,27 +116,17 @@ fun OrderScreen(
                     .padding(innerPadding)
                     .padding(12.dp)
             ) {
-                orders.let {
-                    allOrder(userId ,order = orders, navController)
+                orders1.let {
+                    allOrder1(userId ,order = orders1, navController)
                 }
             }
         }
     )
 }
-@Composable
-fun getStatusText(status: String?): String {
-    return when (status) {
-        "Processing" -> "Chờ xác nhận"
-        "Shipping" -> "Đang giao hàng"
-        "Shipped" -> "Đã giao hàng"
-        "Canceled" -> "Đã hủy"
-        "Delivered" -> "Đã nhận"
-        else -> ""
-    }
-}
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun allOrder(userId: String?,order: List<Order>, navController: NavHostController){
+fun allOrder1(userId: String?, order: List<Order>, navController: NavHostController){
     val scrollState = rememberLazyListState()
     LazyColumn(
         state = scrollState
@@ -152,7 +164,7 @@ fun allOrder(userId: String?,order: List<Order>, navController: NavHostControlle
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
-                    androidx.compose.material.Surface(
+                    Surface(
                         onClick = {
                             navController.navigate("order_detail/${userId!!}/${it?.id!!}")
                             Log.e("order:","${it.id}")
@@ -173,7 +185,7 @@ fun allOrder(userId: String?,order: List<Order>, navController: NavHostControlle
                                     .padding(6.dp)
                                     .weight(1f)
                             ) {
-                                androidx.compose.material.Text(
+                                Text(
                                     text = "${it.restaurant}",
                                     color = Color.DarkGray,
                                     fontSize = 22.sp,
@@ -181,7 +193,7 @@ fun allOrder(userId: String?,order: List<Order>, navController: NavHostControlle
                                     modifier = Modifier
                                         .padding(bottom = 6.dp)
                                 )
-                                androidx.compose.material.Text(
+                                Text(
                                     text = "x${it.items?.size} món",
                                     color = Color.DarkGray,
                                     fontSize = 18.sp,
@@ -193,7 +205,7 @@ fun allOrder(userId: String?,order: List<Order>, navController: NavHostControlle
                                     val formattedPrice = NumberFormat.getCurrencyInstance(
                                         Locale("vi", "VN")
                                     ).format(it)
-                                    androidx.compose.material.Text(
+                                    Text(
                                         text = "Tổng tiền: "+ formattedPrice,
                                         color = Color.DarkGray,
                                         fontSize = 18.sp,
@@ -203,7 +215,7 @@ fun allOrder(userId: String?,order: List<Order>, navController: NavHostControlle
                                     )
                                 }
                                 it.status.let {
-                                    androidx.compose.material.Text(
+                                    Text(
                                         text = getStatusText(it),
                                         color = green,
                                         fontSize = 18.sp,
@@ -221,7 +233,7 @@ fun allOrder(userId: String?,order: List<Order>, navController: NavHostControlle
                                         "HH:mm",
                                         Locale.getDefault()
                                     ).format(date)
-                                    androidx.compose.material.Text(
+                                    Text(
                                         text = formattedDate,
                                         color = grayFont,
                                         fontSize = 18.sp,

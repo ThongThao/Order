@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.TextUtils
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,14 +18,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -51,7 +48,7 @@ import com.example.admin.model.Category
 import com.example.admin.screens.SelectItemImageSection
 import com.example.admin.ui.theme.OrderTheme
 import com.example.admin.ui.theme.blue
-import com.example.admin.ui.theme.blue3
+import com.example.admin.ui.theme.blueColor
 import com.example.admin.ui.theme.grayFont
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -63,35 +60,33 @@ class UpdateCategory : ComponentActivity() {
         setContent {
             OrderTheme {
                 val navController = rememberNavController()
-                Surface(
-
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Scaffold() {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    Scaffold {
                         CenterAlignedTopAppBar(
                             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                                containerColor = blue3,
+                                containerColor = blueColor,
                                 titleContentColor = Color.White,
                                 navigationIconContentColor = Color.White,
                                 actionIconContentColor = Color.White
                             ),
                             title = {
                                 Text(
-                                    text = "Edit Category",
+                                    text = "Update Category",
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Bold
                                 )
                             },
                             navigationIcon = {
-                                IconButton(onClick = { navController.popBackStack()}) {
+                                IconButton(onClick = {
+                                    this@UpdateCategory.startActivity(
+                                        Intent(
+                                            this@UpdateCategory,
+                                            AllCategory::class.java
+                                        )
+                                    )
+                                }) {
                                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "")
-                                }
-                            },
-                            actions = {
-                                IconButton(onClick = {/* Do Something*/ }) {
-                                    Icon(imageVector = Icons.Filled.Settings, null)
                                 }
                             }
                         )
@@ -99,9 +94,9 @@ class UpdateCategory : ComponentActivity() {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(0.dp, 50.dp, 0.dp),
+                            .padding(0.dp, 100.dp, 0.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                    ){
+                    ) {
 
                         updateUI(
                             LocalContext.current,
@@ -124,52 +119,42 @@ fun updateUI(
     imgurl: String?,
     categoryId: String?
 ){
-    val categoryName = remember {
-        mutableStateOf(name)
-    }
-    val categoryImage = remember {
-        mutableStateOf(imgurl)
-    }
-    val newImageUrl = remember {
-        mutableStateOf<String?>(null)
-    }
+    val categoryName = remember { mutableStateOf(name) }
+    val categoryImage = remember { mutableStateOf(imgurl) }
 
+    val newImageUrl = remember { mutableStateOf<String?>(null) }
     Column(
-        modifier = Modifier
-//            .fillMaxSize()
-            .padding(40.dp),
+        modifier = Modifier.padding(40.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-//        verticalArrangement = Arrangement.Center
     ) {
-
+        SelectItemImageSection { imageUrl ->
+            newImageUrl.value = imageUrl
+        }
+        Spacer(modifier = Modifier.size(7.dp))
         OutlinedTextField(
-            value = categoryName.value.toString(),
+            value = categoryName.value.orEmpty(),
             onValueChange = { categoryName.value = it },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(62.dp),
+                .height(58.dp),
             shape = RoundedCornerShape(10.dp),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             singleLine = true,
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 containerColor = Color.White,
-                focusedBorderColor = blue,
-                unfocusedBorderColor = Color.LightGray
+                focusedBorderColor = blueColor,
+                unfocusedBorderColor = blue
             ),
-            label = { Text(text = "Name", color = grayFont)}
+            label = { Text(text = "Category Name", color = grayFont) }
         )
-        Spacer(modifier = Modifier.size(7.dp))
-        SelectItemImageSection { imageUrl ->
-            // Gán URL mới cho mutable state variable
-            newImageUrl.value = imageUrl
-        }
+
         Spacer(modifier = Modifier.size(30.dp))
         Button(
             onClick = {
-                if (TextUtils.isEmpty(categoryName.value.toString())) {
-                    Toast.makeText(context, "Please enter name", Toast.LENGTH_SHORT)
-                        .show()
-                } else {
+                if (categoryName.value.isNullOrEmpty()) {
+                    Toast.makeText(context, "Please enter category name", Toast.LENGTH_SHORT).show()
+                }  else {
+
                     val imageUrl = newImageUrl.value ?: categoryImage.value
                     updateDataToFirebase(
                         categoryId,
@@ -178,6 +163,7 @@ fun updateUI(
                         context
                     )
                 }
+
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -188,27 +174,26 @@ fun updateUI(
                 pressedElevation = 6.dp
             ),
             colors = ButtonDefaults.buttonColors(
-                containerColor = blue
-            ),
-//                border = BorderStroke(0.5.dp, Color.Red)
+                containerColor = blueColor
+            )
         ) {
-            Text(text = "UPDATE", fontWeight = FontWeight.Bold,fontSize = 18.sp)
+            Text(text = "Update", fontWeight = FontWeight.Bold, fontSize = 18.sp)
         }
 
-        Spacer(modifier = Modifier.size(30.dp))
-        TextButton(onClick = {
-            context.startActivity(Intent(context, AllCategory::class.java))
-        },
+        Spacer(modifier = Modifier.size(10.dp))
+        TextButton(
+            onClick = {
+                context.startActivity(Intent(context, AllCategory::class.java))
+            },
         ) {
             Text(
-                text = "Back",
+                text = "Exit",
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Red,
+                color = blueColor,
             )
         }
     }
-
 }
 
 private fun updateDataToFirebase(

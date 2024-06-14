@@ -9,7 +9,10 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,39 +21,42 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.rounded.Clear
+import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.example.admin.R
 import com.example.admin.model.User
 import com.example.admin.screens.Home
-import com.example.admin.ui.theme.Purple80
-import com.example.admin.ui.theme.blue
-import com.example.admin.ui.theme.blue2
-import com.example.admin.ui.theme.blue3
+import com.example.admin.ui.theme.blackcart
+import com.example.admin.ui.theme.blueColor
+import com.example.admin.ui.theme.delete
 import com.google.firebase.firestore.FirebaseFirestore
 
 class AllUser : ComponentActivity() {
@@ -60,38 +66,74 @@ class AllUser : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            var userList = mutableStateListOf<User>()
-            var db: FirebaseFirestore = FirebaseFirestore.getInstance()
-
-            db.collection("users")
-                .get()
-                .addOnSuccessListener { queryDocumentSnapshot ->
-                if (!queryDocumentSnapshot.isEmpty){
-                    val list = queryDocumentSnapshot.documents
-                    for (d in list){
-                        val c: User? = d.toObject(User::class.java)
-                        c?.id = d.id
-                        Log.e("TAG", "User id is : " + c!!.id)
-                        userList.add(c)
-                    }
-                }else{
-                    Toast.makeText(
-                        this@AllUser,
-                        "No data found in Database",
-                        Toast.LENGTH_SHORT
-                    ).show()
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+//                    color = MaterialTheme.colorScheme.background
+            ) {
+                Scaffold {
+                    CenterAlignedTopAppBar(
+                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                            containerColor = blueColor,
+                            titleContentColor = Color.White,
+                            navigationIconContentColor = Color.White,
+                            actionIconContentColor = Color.White
+                        ),
+                        title = {
+                            Text(
+                                text = "All User",
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
+                        navigationIcon = {
+                            IconButton(onClick = {
+                                this@AllUser.startActivity(
+                                    Intent(
+                                        this@AllUser,
+                                        Home::class.java
+                                    )
+                                )
+                            }) {
+                                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "")
+                            }
+                        },
+                    )
                 }
-            }.addOnFailureListener {
-                Toast.makeText(
-                    this@AllUser,
-                    "Fail to get the data.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                var userList = mutableStateListOf<User>()
+                var db: FirebaseFirestore = FirebaseFirestore.getInstance()
+
+                db.collection("users")
+                    .get()
+                    .addOnSuccessListener { queryDocumentSnapshot ->
+                        if (!queryDocumentSnapshot.isEmpty) {
+                            val list = queryDocumentSnapshot.documents
+                            for (d in list) {
+                                val c: User? = d.toObject(User::class.java)
+                                c?.id = d.id
+                                Log.e("TAG", "User id is : " + c!!.id)
+                                userList.add(c)
+                            }
+                        } else {
+                            Toast.makeText(
+                                this@AllUser,
+                                "No data found in Database",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }.addOnFailureListener {
+                        Toast.makeText(
+                            this@AllUser,
+                            "Fail to get the data.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                alluserUI(LocalContext.current, userList)
             }
-            alluserUI(LocalContext.current, userList)
         }
     }
 }
+
 private fun deleteDataFromFirebase(id: String?, context: Context) {
 
 
@@ -110,145 +152,193 @@ private fun deleteDataFromFirebase(id: String?, context: Context) {
 @SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun alluserUI(context: Context, userList: SnapshotStateList<User>) {
 
-fun alluserUI(context: Context, userList: SnapshotStateList<User>){
     Column(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .padding(12.dp, 75.dp, 12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(
-            modifier = Modifier
-                .padding(top = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(onClick = { context.startActivity(Intent(context, Home::class.java)) }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_back),
-                    contentDescription = "",
-                    tint = blue,
-                    modifier = Modifier.size(40.dp)
-                )
-            }
-            Spacer(modifier = Modifier.width(75.dp))
-            Text(
-                text = "All User", style = TextStyle(
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-            )
-            Spacer(modifier = Modifier.width(75.dp))
-            IconButton(onClick = { }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_add),
-                    contentDescription = "",
-                    tint = blue,
-                    modifier = Modifier.size(40.dp)
-                )
-            }
-        }
+
+
         LazyColumn {
-            itemsIndexed(userList) {index, item ->
-                Surface(
-                    color = blue2,
+            itemsIndexed(userList) { index, item ->
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(shape = RoundedCornerShape(8.dp))
-                        .padding(10.dp),
-                    onClick = {
+                        .padding(vertical = 10.dp, horizontal = 5.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+//                            .padding(end = 5.dp),
+//                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Person,
+                            contentDescription = null,
+                            modifier = Modifier.height(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        userList[index]?.role?.let {
+                            Text(
+                                text = it,
+                                fontSize = 15.sp,
+                                color = blackcart,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
 
                     }
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
+
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color.White,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = Color.LightGray,
+                                shape = RoundedCornerShape(12.dp),
+                            )
+                            .padding(bottom = 2.dp),
+                        shadowElevation = 6.dp,
+                        onClick = {
+
+                        }
                     ) {
 
-                        Spacer(modifier = Modifier.height(5.dp))
-                        Row {
-                            Surface(
-                                shape = CircleShape,
-                                modifier = Modifier.size(width = 80.dp, height = 80.dp)
+                        Row(
+                            modifier = Modifier
+                                .padding(bottom = 10.dp, start = 10.dp),
+                        ) {
+                            androidx.compose.material.Surface(
+                                shape = RoundedCornerShape(9.dp),
+                                modifier = Modifier
+                                    .padding(top = 22.dp)
+                                    .size(width = 70.dp, height = 70.dp)
                             ) {
-                                val painter = if ( userList[index]?.image!= null) {
-                                    rememberAsyncImagePainter( userList[index]?.image)
-                                } else {
-                                    painterResource(id = R.drawable.profile)
-                                }
-                              Image(
-                                  painter = painter,
-                                  contentDescription = "",
-                                  contentScale = ContentScale.Crop,
-                              )
-                            }
 
-                            Spacer(modifier = Modifier.width(15.dp))
+                                userList[index]?.image?.let {
+                                    Image(
+                                        painter = rememberAsyncImagePainter(it),
+                                        contentDescription = "",
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                            }
                             Column(
                                 modifier = Modifier
-                                    .fillMaxSize()
+                                    .padding(start = 10.dp, top = 20.dp)
+                                    .fillMaxWidth()
                                     .weight(2f),
                             ) {
-                                Surface(
-                                    shape = RoundedCornerShape(24.dp),
+                                Row(
                                     modifier = Modifier
-                                        .wrapContentSize()
-                                        .padding(top = 3.dp),
-                                    color = blue3
+                                        .padding(bottom = 10.dp)
                                 ) {
-                                   userList[index]?.role?.let {
+                                    Text(
+                                        text = "Name:",
+                                        fontSize = 15.sp,
+                                        color = Color.DarkGray
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    userList[index]?.fullName?.let {
                                         Text(
                                             text = it,
-                                            fontSize = 12.sp,
-                                            style = MaterialTheme.typography.titleSmall,
-                                            modifier = Modifier.padding(
-                                                vertical = 4.dp,
-                                                horizontal = 8.dp
-                                            ),
-                                            color = Color.Black
+                                            fontSize = 16.sp,
+                                            color = blackcart,
+                                            fontWeight = FontWeight.Medium
                                         )
                                     }
                                 }
-                                Spacer(modifier = Modifier.height(4.dp))
-                                userList[index]?.fullName?.let {
+                                Row(
+                                    modifier = Modifier
+                                        .padding(bottom = 10.dp)
+                                ) {
                                     Text(
-                                        text = it,
-                                        fontSize =  20.sp,
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.SemiBold
+                                        text = "Phone:",
+                                        fontSize = 15.sp,
+                                        color = Color.DarkGray
                                     )
-                                }
-
-
-                                Spacer(modifier = Modifier.height(4.dp))
-
-                            }
-                            Column( ) {
-
-                                IconButton(
-                                    onClick = {
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    userList[index]?.phoneNumber?.let {
+                                        Text(
+                                            text = it,
+                                            fontSize = 16.sp,
+                                            color = blackcart,
+                                            fontWeight = FontWeight.Medium
+                                        )
                                     }
+                                }
+                                Row(
+                                    modifier = Modifier
+                                        .padding(bottom = 10.dp)
+                                ) {
+                                    Text(
+                                        text = "Email:",
+                                        fontSize = 15.sp,
+                                        color = Color.DarkGray
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    userList[index]?.email?.let {
+                                        Text(
+                                            text = it,
+                                            fontSize = 16.sp,
+                                            color = blackcart,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+
+                                }
+                                Row(
+                                    modifier = Modifier
+                                        .padding(bottom = 10.dp)
+                                ) {
+                                    Text(
+                                        text = "Address:",
+                                        fontSize = 15.sp,
+                                        color = Color.DarkGray
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    userList[index]?.address?.let {
+                                        Text(
+                                            text = it,
+                                            fontSize = 16.sp,
+                                            color = blackcart,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+                            }
+
+                            Column(
+                                modifier = Modifier
+                                    .weight(0.3f),
+                                verticalArrangement = Arrangement.Top,
+                                horizontalAlignment = Alignment.End
+                            ) {
+                                Button(
+                                    onClick = {
+                                        deleteDataFromFirebase(item.id, context)
+                                    },
+                                    contentPadding = PaddingValues(),
+                                    shape = CircleShape,
+                                    colors = ButtonDefaults.buttonColors(backgroundColor = delete, contentColor = Color.White),
+                                    modifier = Modifier
+                                        .width(23.dp)
+                                        .height(23.dp)
                                 ) {
                                     Icon(
-                                        painterResource(id = R.drawable.ic_edit),
-                                        contentDescription = "",
-                                        tint = Purple80,
-                                        modifier = Modifier.size(30.dp)
+                                        imageVector = Icons.Rounded.Clear,
+                                        null,
+                                        modifier = Modifier
+                                            .size(18.dp),
+                                        tint = Color.White
                                     )
                                 }
-                                IconButton(
-                                    onClick = { deleteDataFromFirebase(userList[index]?.id, context) },
-                                ) {
-                                    Icon(
-                                        painterResource(id = R.drawable.ic_delete),
-                                        contentDescription = "",
-                                        tint= Color.Red,
-                                        modifier = Modifier.size(30.dp)
-
-                                    )
-                                }
-
                             }
                         }
-
-
                     }
                 }
             }

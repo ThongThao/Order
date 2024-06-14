@@ -70,5 +70,8 @@ sealed class Screen(
     {
         fun createRoute(restaurantName: String) = "cart_detail/$restaurantName"
     }
+    object OrderHistory : Screen("OrderHistory/{userId}"){
+        fun createRoute(userId: String) = "OrderHistory/$userId"
+    }
 
 }

@@ -21,12 +21,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -37,8 +43,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -48,8 +54,8 @@ import com.example.admin.R
 import com.example.admin.model.Category
 import com.example.admin.screens.Home
 import com.example.admin.ui.theme.Purple80
-import com.example.admin.ui.theme.blue
 import com.example.admin.ui.theme.blue2
+import com.example.admin.ui.theme.blueColor
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -59,6 +65,34 @@ class AllCategory : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            Surface(modifier = Modifier.fillMaxSize()) {
+                Scaffold(
+                    topBar = {
+                        CenterAlignedTopAppBar(
+                            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                                containerColor = blueColor,
+                                titleContentColor = Color.White,
+                                navigationIconContentColor = Color.White,
+                                actionIconContentColor = Color.White
+                            ),
+                            title = {
+                                Text(
+                                    text = "All Category",
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            navigationIcon = {
+                                IconButton(onClick = {
+                                    startActivity(Intent(this@AllCategory, Home::class.java))
+                                }) {
+                                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "")
+                                }
+                            }
+                        )
+                    }
+                ) {
                     var categoryList = mutableStateListOf<Category>()
                     var db: FirebaseFirestore = FirebaseFirestore.getInstance()
                     val dbCategory: CollectionReference = db.collection("Category")
@@ -87,6 +121,8 @@ class AllCategory : ComponentActivity() {
                         ).show()
                     }
                     allUI(LocalContext.current, categoryList, navController = rememberNavController())
+                }
+            }
         }
     }
 }
@@ -113,50 +149,15 @@ private fun deleteDataFromFirebase(categoryId: String?, context: Context) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun allUI(context: Context, productList: SnapshotStateList<Category>,navController: NavHostController){
-
     Column(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .padding(top = 70.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
-           Row(
-               modifier = Modifier
-                   .padding(top = 10.dp),
-               verticalAlignment = Alignment.CenterVertically,
-           ) {
-               IconButton(onClick = { context.startActivity(Intent(context, Home::class.java)) }) {
-                   Icon(
-                       painter = painterResource(id = R.drawable.ic_back),
-                       contentDescription = "",
-                       tint = blue,
-                       modifier = Modifier.size(40.dp)
-                   )
-               }
-               Spacer(modifier = Modifier.width(55.dp))
-               Text(
-                   text = "All Category", style = TextStyle(
-                       fontSize = 30.sp,
-                       fontWeight = FontWeight.Bold,
-                   )
-               )
-               Spacer(modifier = Modifier.width(55.dp))
-               IconButton(onClick = {
-                   context.startActivity(
-                       Intent(
-                           context,
-                           AddCategory::class.java
-                       )
-                   )
-               }) {
-                   Icon(
-                       painter = painterResource(id = R.drawable.ic_add),
-                       contentDescription = "",
-                       tint = blue,
-                       modifier = Modifier.size(40.dp)
-                   )
-               }
-           }
+        IconButton(onClick = { context.startActivity(Intent(context, AddCategory::class.java)) }) {
+            Icon(imageVector = Icons.Default.AddCircle, contentDescription = "")
+        }
 
         LazyColumn {
             itemsIndexed(productList) {index, item ->
@@ -168,14 +169,6 @@ fun allUI(context: Context, productList: SnapshotStateList<Category>,navControll
                         .padding(10.dp),
 
                     shadowElevation = 10.dp,
-                    onClick = {
-                        val i = Intent(context, UpdateCategory::class.java)
-                        i.putExtra("categoryName", item?.categoryName)
-                        i.putExtra("categoryImage", item?.categoryImage)
-                        i.putExtra("categoryId", item?.categoryId)
-
-                        context.startActivity(i)
-                    }
                 ) {
                     Row(
                         modifier = Modifier.padding(16.dp),

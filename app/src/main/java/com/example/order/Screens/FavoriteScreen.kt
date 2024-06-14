@@ -1,7 +1,7 @@
 package com.example.order.Screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,12 +16,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FabPosition
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,6 +39,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,10 +47,14 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.app.R
 import com.example.order.model.Restaurant
+import com.example.order.ui.theme.Shapes
+import com.example.order.ui.theme.delete
+import com.example.order.ui.theme.menu
 import com.example.order.ui.theme.metropolisFontFamily
 import com.example.order.ui.theme.orange
 import com.example.order.ui.theme.orange1
 import com.example.order.ui.theme.primaryFontColor
+import com.example.order.ui.theme.red
 import com.example.order.ui.theme.secondaryFontColor
 import com.example.order.viewmodels.FavoriteViewModel
 
@@ -63,52 +72,81 @@ fun FavoriteScreen(
     }
 
     Scaffold(
+        scaffoldState = rememberScaffoldState(),
+        floatingActionButtonPosition = FabPosition.Center,
+        isFloatingActionButtonDocked = true,
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = orange,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    containerColor = Color.White,
+                    titleContentColor = Color.Black,
+                    navigationIconContentColor = Color.Black,
+                    actionIconContentColor = Color.Black
                 ),
                 title = {
                     Text(
                         text = "Yêu thích",
-                        fontSize = 25.sp,
-                        fontWeight = MaterialTheme.typography.h6.fontWeight,
-                        modifier = Modifier.padding(start = 125.dp)
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontWeight = FontWeight.Bold
                     )
                 },
 
+                actions = {
+                    Row(
+                        modifier = Modifier.padding(end = 15.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Favorite,
+                            contentDescription = "",
+                            tint = delete
+                        )
+                        androidx.compose.material.Text(text = "${favoriteRestaurants.size}", color = red, fontWeight = FontWeight.SemiBold)
+                    }
+                }
             )
-        }
-    )  { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(12.dp)
-        ) {
-            items(favoriteRestaurants) { restaurant ->
-                RestaurantItem(item = restaurant,navController)
+        },
+
+        content = { innerPadding ->
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(12.dp)
+            ) {
+                items(favoriteRestaurants) { restaurant ->
+                    RestaurantItem(item = restaurant, navController)
+                }
             }
         }
-    }
+    )
 }
 
+
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun RestaurantItem(item: Restaurant,navController: NavHostController) {
     val itemRate = item.restaurantRate?.toDouble()
-    Row(modifier = Modifier
+    androidx.compose.material.Surface(
+        onClick = {
+            navController.navigate("restaurantDetail/${item.restaurantName}")
+        },
+        shape = Shapes.medium,
+        color = Color.White,
+        border = BorderStroke(1.dp, menu),
+        elevation = 1.dp
+    ) {
+    Row( verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
         .fillMaxWidth()
-        .padding(bottom = 10.dp)
-        .clickable { navController.navigate("restaurantDetail/${item.restaurantName}") }) {
+            .padding(8.dp)
+        ) {
         item.restaurantImage?.let {
             Image(
                 modifier = Modifier
                     .width(120.dp)
                     .aspectRatio(1f)
-                    .clip(RoundedCornerShape(8.dp)),
+                    .clip(RoundedCornerShape(12.dp)),
                 painter = rememberAsyncImagePainter(it),
                 contentDescription = null,
                 contentScale = ContentScale.Crop
@@ -180,8 +218,9 @@ fun RestaurantItem(item: Restaurant,navController: NavHostController) {
                 )
             }
 
-
+        }
         }
     }
+    Spacer(modifier = Modifier.height(10.dp))
 }
 

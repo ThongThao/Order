@@ -165,7 +165,7 @@ fun allrestaurantUI(context: Context, restaurantList: SnapshotStateList<Restaura
                         i.putExtra("restaurantName", item?.restaurantName)
                         i.putExtra("restaurantAdd", item?.restaurantAdd)
                         i.putExtra("restaurantType", item?.restaurantType)
-                        i.putExtra("restaurantRate", item?.restaurantRate)
+                        i.putExtra("restaurantRate", item?.restaurantRate.toString())
                         i.putExtra("restaurantImage", item?.restaurantImage)
                         i.putExtra("restaurantId", item?.restaurantId)
 

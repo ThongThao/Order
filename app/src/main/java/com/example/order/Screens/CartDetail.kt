@@ -252,7 +252,7 @@ fun CartDetail(
                     cartViewModel.placeOrder(order, onSuccess = {
                         userId?.let {
                             cartViewModel.removeRestaurantCart(it, restaurantName ?: "", onSuccess = {
-                                navController.navigate(HomeScreens.HOME.name)
+                                navController.navigate(HomeScreens.LIST.name)
                             }, onFailure = { exception ->
                                 // Handle failure
                             })

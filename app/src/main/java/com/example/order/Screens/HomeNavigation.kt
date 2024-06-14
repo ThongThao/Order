@@ -2,7 +2,6 @@ package com.example.order.Screens
 
 import CartDetail
 import CartScreen
-import EditProfileScreen
 import OrderDetail
 import SignInScreen
 import android.annotation.SuppressLint
@@ -30,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -51,7 +51,7 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
 enum class HomeScreens {
     LIST,
-    NOTIFICATION,
+    CART,
     HOME,
     PROFILE,
     MORE,
@@ -127,13 +127,13 @@ fun HomeNavigation(userId: String?) {
                                 )
                             },
                         )
-                        BottomNavigationItem(selected = selectedItem.value == HomeScreens.NOTIFICATION,
-                            onClick = { selectedItem.value = HomeScreens.NOTIFICATION },
+                        BottomNavigationItem(selected = selectedItem.value == HomeScreens.CART,
+                            onClick = { selectedItem.value = HomeScreens.CART },
                             icon = {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.ic_notification),
+                                    painter = painterResource(id = R.drawable.ic_cart),
                                     contentDescription = "Thông báo",
-                                    tint = if (selectedItem.value == HomeScreens.NOTIFICATION) orange else placeholderColor
+                                    tint = if (selectedItem.value == HomeScreens.CART) orange else placeholderColor
                                 )
                             },
                             modifier = Modifier.padding(end = 35.dp)
@@ -208,30 +208,22 @@ fun HomeNavHost(navHostController: NavHostController, userId: String?) {
         }
 
         composable(
-            route = HomeScreens.NOTIFICATION.name,
+            route = HomeScreens.CART.name,
         ) {
-            val homeViewModel: HomeViewModel = viewModel()
-            HomeScreen(homeViewModel,
-                navToRes = {
-                    navHostController.navigate(Screen.Restaurant.createRoute(userId ?: ""))
-                },
-                navToCart={},
-                navToChangeAddress = {
-                    navHostController.navigate(Screen.ChangeAddress.createRoute(userId ?: ""))
-                },
-                navController = navHostController,userId = userId
-            )
+            CartScreen(userId ,navController = navHostController)
         }
 
         composable(
             route = HomeScreens.PROFILE.name,
         ) {
-            ProfileScreen(userId = userId,
-                navToEdit = {
-                    navHostController.navigate(Screen.Edit.createRoute(userId ?: ""))
-                },
-                navToLogin = {navHostController.navigate(Screen.Login.route)}
-                )
+            ProfileScreen(userId = userId, navController = navHostController, LocalContext.current)
+        }
+        composable(
+            "profile/{userId}",
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId") ?: return@composable
+            EditProfileScreen(userId,navController=navHostController,LocalContext.current)
         }
         composable(route = Screen.Login.route) {
             SignInScreen(
@@ -295,20 +287,32 @@ fun HomeNavHost(navHostController: NavHostController, userId: String?) {
             val restaurantName = backStackEntry.arguments?.getString("restaurantName")
             CartDetail(userId,restaurantName,navController = navHostController)
         }
-        composable(route = Screen.Edit.route,
-            arguments = listOf(navArgument("userId") { type = NavType.StringType })) { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId")
-            EditProfileScreen(userId,navController = navHostController)
-        }
         composable(
-            "order_detail/{orderId}",
-            arguments = listOf(navArgument("orderId") { type = NavType.StringType })
+            "order_detail/{userId}/{orderId}",
+            arguments = listOf(
+                navArgument("userId") { type = NavType.StringType },
+                navArgument("orderId") { type = NavType.StringType }
+            )
         ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId")
             val orderId = backStackEntry.arguments?.getString("orderId") ?: return@composable
             OrderDetail(
-                orderId = orderId,
-                navController = navHostController
+                navController = navHostController,
+                 orderId,
+                userId,
+
             )
+        }
+        composable(Screen.OrderHistory.route,arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId")
+            OrderHistory(userId!!,navController = navHostController)
+        }
+        composable(route = "rating/{userId}/{restaurantName}",
+            arguments = listOf(navArgument("userId"){ type = NavType.StringType }, navArgument("restaurantName"){ type = NavType.StringType })) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId")
+            val restaurantName = backStackEntry.arguments?.getString("restaurantName")
+            RatingAndComment(userId,restaurantName,navController = navHostController)
         }
     }
 }

@@ -8,27 +8,38 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Clear
+import androidx.compose.material.icons.rounded.DateRange
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,21 +49,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.admin.R
 import com.example.admin.model.Order
 import com.example.admin.model.OrderStatus
-import com.example.admin.screens.Home
 import com.example.admin.ui.theme.OrderTheme
-import com.example.admin.ui.theme.Pink80
+import com.example.admin.ui.theme.blackcart
 import com.example.admin.ui.theme.blue
-import com.example.admin.ui.theme.blue2
-import com.example.admin.ui.theme.blue3
-import com.example.admin.ui.theme.ok
+import com.example.admin.ui.theme.delete
+import com.example.admin.ui.theme.green
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
@@ -117,148 +124,217 @@ fun updateOrderStatus(orderId: String, newStatus: OrderStatus) {
         }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PendingScreen(context: Context, pendingList: List<Order>) {
     Column(
         modifier = Modifier
             .fillMaxSize(),
     ) {
-        Row(
-            modifier = Modifier
-                .padding(top = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(onClick = { context.startActivity(Intent(context, Home::class.java)) }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_back),
-                    contentDescription = "",
-                    tint = blue,
-                    modifier = Modifier.size(40.dp)
+        CenterAlignedTopAppBar(
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = blue,
+                titleContentColor = Color.White,
+                navigationIconContentColor = Color.White,
+                actionIconContentColor = Color.White
+            ),
+            title = {
+                Text(
+                    text = "Order Processing",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontWeight = FontWeight.Bold
                 )
-            }
-            Spacer(modifier = Modifier.width(55.dp))
-            Text(
-                text = "Order Processing", style = TextStyle(
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-            )
-        }
+            },
+            navigationIcon = {
+                IconButton(onClick = {
+                    context.startActivity(Intent(context, OrderManager::class.java))
+                }) {
+                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "")
+                }
+            },
+        )
 
-        LazyColumn {
+        LazyColumn(
+            Modifier.padding(vertical = 15.dp, horizontal = 15.dp)
+        ) {
             items(pendingList) { order ->
-                Surface(
-                    color = blue2,
-                    shape = RoundedCornerShape(15.dp),
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp),
-                    onClick = {}
+                        .padding(vertical = 10.dp, horizontal = 5.dp)
                 ) {
                     Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(end = 5.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                        ) {
-                            Row() {
-                                Surface(
+                        Row {
+                            Icon(
+                                imageVector = Icons.Rounded.DateRange,
+                                contentDescription = null,
+                                modifier = Modifier.height(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(5.dp))
+                            order.date?.let { date ->
+                                val formattedDate = SimpleDateFormat(
+                                    "dd/MM/yyyy HH:mm",
+                                    Locale("vi", "VN")
+                                ).format(date)
+                                Text(
+                                    text = formattedDate,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontSize = 15.sp,
+                                    color = blackcart
+                                )
+                            }
+                        }
+
+                    }
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color(0xFFFFFAEB),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = Color.LightGray,
+                                shape = RoundedCornerShape(12.dp),
+                            )
+                            .padding(bottom = 2.dp),
+                        shadowElevation = 6.dp,
+                        onClick = {
+                            val i = Intent(context, OrderDetail::class.java)
+                            i.putExtra("OrderID", order.id)
+                            context.startActivity(i)
+                        }
+                    ) {
+                        Row {
+                            Column(
+                                modifier = Modifier
+                                    .padding(15.dp)
+                                    .fillMaxWidth()
+                                    .weight(2f),
+                            ) {
+                                androidx.compose.material3.Surface(
                                     shape = RoundedCornerShape(24.dp),
                                     modifier = Modifier
                                         .wrapContentSize()
-                                        .padding(top = 3.dp),
-                                    color = blue3
-                                ) {
-                                    order.date?.let { date ->
-                                        val formattedDate = SimpleDateFormat(
-                                            "dd/MM/yyyy HH:mm",
-                                            Locale.getDefault()
-                                        ).format(date)
-                                        Text(
-                                            text = formattedDate,
-                                            fontSize = 12.sp,
-                                            style = MaterialTheme.typography.titleSmall,
-                                            modifier = Modifier.padding(
-                                                vertical = 4.dp,
-                                                horizontal = 8.dp
-                                            ),
-                                            color = Color.Black
-                                        )
-                                    }
-                                }
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Surface(
-                                    shape = RoundedCornerShape(24.dp),
-                                    modifier = Modifier
-                                        .wrapContentSize()
-                                        .padding(top = 3.dp),
-                                    color = Pink80
+                                        .padding(bottom = 12.dp),
+                                    color = Color(0xFFF3B95F)
                                 ) {
                                     order.status?.let {
                                         Text(
                                             text = it,
-                                            fontSize = 12.sp,
+                                            fontSize = 15.sp,
                                             style = MaterialTheme.typography.titleSmall,
                                             modifier = Modifier.padding(
                                                 vertical = 4.dp,
                                                 horizontal = 8.dp
                                             ),
-                                            color = Color.Black
+                                            color = Color.White
                                         )
                                     }
                                 }
-                            }
-                            Text(
-                                text = "${order.restaurant}",
-                                modifier = Modifier.padding(top = 5.dp),
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            order.total?.let {
-                                val formattedPrice = NumberFormat.getCurrencyInstance(
-                                    Locale("vi", "VN")
-                                ).format(it)
-                                Text(
-                                    text = "Total: $formattedPrice",
-                                    modifier = Modifier.padding(top = 5.dp),
-                                    fontSize = 20.sp,
-                                )
-                            }
-                            Text(
-                                text = "Customer: ${order.custumerName}",
-                                modifier = Modifier.padding(top = 5.dp),
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                        Column(modifier = Modifier.padding(end = 15.dp)) {
-                            IconButton(onClick = {
-                                updateOrderStatus(order.id ?: "", OrderStatus.Shipping)
-                                context.startActivity(Intent(context, OrderPending::class.java))
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription = "",
-                                    modifier = Modifier.size(34.dp),
-                                    tint = ok
-                                )
-                            }
-                            IconButton(onClick = {
-                                updateOrderStatus(order.id ?: "", OrderStatus.Canceled)
-                                context.startActivity(Intent(context, OrderPending::class.java))
-                            }) {
+                                Row(
+                                    modifier = Modifier
+                                        .padding(bottom = 13.dp)
+                                ) {
+                                    Text(
+                                        text = "Total:",
+                                        fontSize = 17.sp,
+                                        color = Color.DarkGray
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    order.total?.let {
+                                        val formattedPrice = NumberFormat.getCurrencyInstance(
+                                            Locale("vi", "VN")
+                                        ).format(it)
+                                        Text(
+                                            text = formattedPrice,
+                                            fontSize = 18.sp,
+                                            color = blackcart,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+                                Row(
+                                    modifier = Modifier
+                                        .padding(bottom = 5.dp)
+                                ) {
+                                    Text(
+                                        text = "Customer:",
+                                        fontSize = 17.sp,
+                                        color = Color.DarkGray
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "${order.custumerName}",
+                                        fontSize = 18.sp,
+                                        color = blackcart,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
 
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = "",
-                                    modifier = Modifier.size(34.dp),
-                                    tint = Color.Red
-                                )
+                            }
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .weight(0.3f)
+                                    .padding(top = 20.dp)
+                            ) {
+                                Button(
+                                    onClick = {
+                                        updateOrderStatus(order.id ?: "", OrderStatus.Shipping)
+                                        context.startActivity(Intent(context, OrderPending::class.java))
+                                    },
+                                    contentPadding = PaddingValues(),
+                                    shape = CircleShape,
+                                    colors = ButtonDefaults.buttonColors(
+                                        backgroundColor = green,
+                                        contentColor = Color.White
+                                    ),
+                                    modifier = Modifier
+                                        .width(30.dp)
+                                        .height(30.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Check,
+                                        null,
+                                        modifier = Modifier
+                                            .size(22.dp),
+                                        tint = Color.White
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(20.dp))
+                                Button(
+                                    onClick = {
+                                        updateOrderStatus(order.id ?: "", OrderStatus.Canceled)
+                                        context.startActivity(Intent(context, OrderPending::class.java))
+                                    },
+                                    contentPadding = PaddingValues(),
+                                    shape = CircleShape,
+                                    colors = ButtonDefaults.buttonColors(
+                                        backgroundColor = delete,
+                                        contentColor = Color.White
+                                    ),
+                                    modifier = Modifier
+                                        .width(30.dp)
+                                        .height(30.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Clear,
+                                        null,
+                                        modifier = Modifier
+                                            .size(22.dp),
+                                        tint = Color.White
+                                    )
+                                }
                             }
                         }
                     }
+
                 }
             }
         }

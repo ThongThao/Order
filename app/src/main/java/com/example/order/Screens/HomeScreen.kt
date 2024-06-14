@@ -331,7 +331,7 @@ fun SectionHeader(sectionName: String, viewAll: () -> Unit) {
 
 @Composable
 fun PopularRestaurantItem(item: Restaurant,navController: NavHostController) {
-    val itemRate = item.restaurantRate?.toDouble()
+    val itemRate = item.restaurantRate?.toFloat()
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(bottom = 25.dp, start = 15.dp)
@@ -430,7 +430,7 @@ fun MostPopular(restaurantList: List<Restaurant>) {
 }
 @Composable
 fun MostPopularItem(item: Restaurant, modifier: Modifier = Modifier) {
-    val itemRate = item.restaurantRate?.toDouble()
+    val itemRate = item.restaurantRate?.toFloat()
     Column(modifier = modifier
         .padding(horizontal = 8.dp)
         .clickable { }) {

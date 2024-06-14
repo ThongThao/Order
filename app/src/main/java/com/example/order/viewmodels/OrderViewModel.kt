@@ -29,6 +29,24 @@ class OrderViewModel : ViewModel() {
                 }
             }
     }
+    private val _orders1 = MutableStateFlow<List<Order>>(emptyList())
+    val orders1: StateFlow<List<Order>> = _orders1
+    fun fetchOrdersForUser1(userId: String) {
+        val validStatus = listOf("Delivered","Canceled")
+        ordersCollection
+            .whereEqualTo("custumerid", userId)
+            .whereIn("status", validStatus)
+            .addSnapshotListener { snapshot, _ ->
+                snapshot?.let { querySnapshot ->
+                    val ordersList = mutableListOf<Order>()
+                    for (document in querySnapshot.documents) {
+                        val order = document.toObject(Order::class.java)
+                        order?.let { ordersList.add(it) }
+                    }
+                    _orders1.value = ordersList
+                }
+            }
+    }
     fun getOrderDetail(orderId: String): Flow<Order?> {
         // Create a MutableStateFlow to hold the order detail
         val orderDetailFlow = MutableStateFlow<Order?>(null)
