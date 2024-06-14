@@ -287,7 +287,7 @@ fun OrderDetail(navController: NavController, orderId: String, userId:String?,
                                     )
                                 }
                             }
-                            if (orderDetail?.status == "Pending") {
+                            if (orderDetail?.status == "Processing") {
                                 Row(modifier = Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.SpaceBetween) {

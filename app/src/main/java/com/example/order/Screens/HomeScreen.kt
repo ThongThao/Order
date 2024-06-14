@@ -56,6 +56,7 @@ import com.example.order.SearchField
 import com.example.order.model.Category
 import com.example.order.model.Menu
 import com.example.order.model.Restaurant
+import com.example.order.model.User
 import com.example.order.ui.theme.metropolisFontFamily
 import com.example.order.ui.theme.orange
 import com.example.order.ui.theme.orange1
@@ -103,7 +104,7 @@ fun HomeScreen(
             ) {
                 //--> Top Section
                 item {
-                    TopBar(it.fullName.toString(), viewCart = navToCart)
+                    TopBar(it.fullName.toString(), user!!, viewCart = navToCart)
                     Location(onChangeAddressClick)
                     SearchField()
                     Spacer(modifier = Modifier.size(18.dp))
@@ -220,7 +221,7 @@ fun getLocation(context: Context, onLocationReceived: (String) -> Unit) {
 }
 
 @Composable
-fun TopBar(userName: String, viewCart: () -> Unit) {
+fun TopBar(userName: String,user: User, viewCart: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -248,16 +249,30 @@ fun TopBar(userName: String, viewCart: () -> Unit) {
                 )
             )
         }
-        IconButton(onClick = viewCart ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_cart),
-                contentDescription = null,
-                tint = primaryFontColor
-            )
-        }
+        ProfileImage1(image = user.image.toString())
     }
 }
+@Composable
+fun ProfileImage1(modifier: Modifier = Modifier, image: String) {
 
+    val placeholderImage = painterResource(id =R.drawable.ic_logo)// Thay thế bằng ID của ảnh mặc định của bạn
+
+    val imagePainter = if (image.isNullOrEmpty()) {
+        placeholderImage
+    } else {
+        rememberAsyncImagePainter(model = image)
+    }
+    Image(
+        painter = imagePainter,
+        contentDescription = "avatar",
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .size(42.dp)
+            .padding(3.dp)
+            .clip(RoundedCornerShape(15.dp))
+    )
+
+}
 @Composable
 fun Categorys(categoryList: List<Category>) {
     val collator = Collator.getInstance(Locale("vi", "VN"))
