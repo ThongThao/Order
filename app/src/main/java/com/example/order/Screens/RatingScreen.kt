@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -31,7 +32,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.app.R
 import com.example.order.model.Rate
+import com.example.order.ui.theme.green
 import com.example.order.ui.theme.orange1
+import com.example.order.ui.theme.red
+import com.example.order.ui.theme.white
 import com.example.order.viewmodel.RatingViewModel
 import java.util.Date
 import java.util.UUID
@@ -97,11 +101,11 @@ fun RatingAndComment(
                 ratingViewModel.submitRating(rate, restaurantName!!)
                 navController.popBackStack()
                 Log.d("RatingAndComment", "Rating: ${userId}, Comment: ${restaurantName},rate:${rating},")
-            }) {
+            }, colors = ButtonDefaults.buttonColors(backgroundColor = green, contentColor = white)) {
                 Text("Gửi")
             }
             Spacer(modifier = Modifier.width(8.dp))
-            Button(onClick = { navController.popBackStack() }) {
+            Button(onClick = { navController.popBackStack() }, colors = ButtonDefaults.buttonColors(backgroundColor = red, contentColor = white))  {
                 Text("Hủy")
             }
         }
