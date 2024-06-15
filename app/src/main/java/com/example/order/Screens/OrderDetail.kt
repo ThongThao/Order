@@ -375,7 +375,7 @@ fun OrderDetail(navController: NavController, orderId: String, userId:String?,
                                     colors = ButtonDefaults.buttonColors(backgroundColor = yellow),
                                 ) {
                                     Text(
-                                        text = "Delivered",
+                                        text = "Đã nhận hàng",
                                         fontSize = 24.sp,
                                         color = Color.White
                                     )

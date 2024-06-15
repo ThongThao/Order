@@ -47,6 +47,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -400,7 +401,10 @@ fun AllItemUI(context: Context,
                                         text = "${it.itemName}",
                                         fontSize = 25.sp,
                                         style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.SemiBold
+                                        fontWeight = FontWeight.SemiBold,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.width(170.dp)
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     val formattedPrice = it.itemPrice?.let {
@@ -408,7 +412,12 @@ fun AllItemUI(context: Context,
                                     } ?: "N/A"
 
                                     Text(text = "Price: $formattedPrice")
-                                    Text(text = "Description:" + it.itemDescription)
+                                    Text(
+                                        text = "Description:" + it.itemDescription,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.width(170.dp)
+                                    )
                                 }
                                 Column() {
                                     IconButton(

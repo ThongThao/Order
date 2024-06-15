@@ -454,7 +454,7 @@ fun CartDetail(
             Row( ) {
                 androidx.compose.material3.Surface(
                     onClick = {
-cartViewModel.removeItemFromCart(userId!!, restaurantName!!, cartItem.id!!)
+              cartViewModel.removeItemFromCart(userId!!, restaurantName!!, cartItem.id!!)
                     },
                     shape = CircleShape,
                     color = delete

@@ -6,7 +6,6 @@ import android.location.Geocoder
 import android.os.Looper
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,7 +22,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -46,6 +44,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -54,27 +53,26 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.app.R
 import com.example.order.SearchField
 import com.example.order.model.Category
-import com.example.order.model.Menu
 import com.example.order.model.Restaurant
 import com.example.order.model.User
 import com.example.order.ui.theme.metropolisFontFamily
 import com.example.order.ui.theme.orange
 import com.example.order.ui.theme.orange1
-import com.example.order.ui.theme.orange2
 import com.example.order.ui.theme.primaryFontColor
 import com.example.order.ui.theme.secondaryFontColor
 import com.example.order.viewmodels.HomeViewModel
 import com.example.order.viewmodels.MenuViewModel
 import com.example.order.viewmodels.RestaurantViewModel
 import com.example.order.viewmodels.UserViewModel
+import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import java.text.Collator
-import java.text.NumberFormat
 import java.util.Locale
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel(),
@@ -90,10 +88,14 @@ fun HomeScreen(
     val user by userViewModel.getUser(userId).observeAsState()
     val categoryList by homeViewModel.categories.collectAsState()
     val restaurantList by restaurantViewModel.restaurants.collectAsState()
+    val restaurantList1 by restaurantViewModel.getTopRatedRestaurants().collectAsState()
     val menuList by menuViewModel.menus.collectAsState()
     var showChangeAddressScreen by remember { mutableStateOf(false) }
     val onChangeAddressClick: () -> Unit = {
         showChangeAddressScreen = true
+    }
+    val randomResList = remember(restaurantList) {
+        restaurantList.shuffled().take(3)
     }
     user?.let { // Hiển thị giao diện
         if (showChangeAddressScreen) {
@@ -112,27 +114,24 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.size(25.dp))
                 }
                 item {
+                    SliderBanner()
+                }
+                item {
                     SectionHeader(sectionName = "Nổi bật", viewAll = navToRes)
                     Spacer(modifier = Modifier.size(8.dp))
                 }
                 //--> PopularRestaurants Section
-                items(restaurantList) { item ->
+                items(restaurantList1) { item ->
                     PopularRestaurantItem(item, navController)
                 }
 
                 //--> MostPopular Section
                 item {
-                    SectionHeader(sectionName = "Phổ biến") {}
-                    Spacer(modifier = Modifier.size(8.dp))
-                    MostPopular(restaurantList)
-                }
-                item {
                     SectionHeader(sectionName = "Đề xuất") {}
                     Spacer(modifier = Modifier.size(8.dp))
+                    MostPopular(randomResList)
                 }
-                items(menuList) { item ->
-                    MenuItem(item, navController)
-                }
+
             }
         }
     }
@@ -350,7 +349,7 @@ fun PopularRestaurantItem(item: Restaurant,navController: NavHostController) {
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(bottom = 25.dp, start = 15.dp)
-        .clickable { navController.navigate("restaurantDetail/${item.restaurantName}")}) {
+        .clickable { navController.navigate("restaurantDetail/${item.restaurantName}") }) {
         item.restaurantImage?.let {
             Image(
                 modifier = Modifier
@@ -424,7 +423,10 @@ fun PopularRestaurantItem(item: Restaurant,navController: NavHostController) {
                     color = primaryFontColor,
                     fontSize = 15.sp,
                     fontFamily = metropolisFontFamily
-                )
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.width(250.dp)
             )
             }
 
@@ -507,98 +509,6 @@ fun MostPopularItem(item: Restaurant, modifier: Modifier = Modifier) {
             )
         }
 
-    }
-}
-@Composable
-fun MenuItem(item: Menu,navController: NavHostController) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 25.dp, start = 15.dp)
-            .clickable {navController.navigate("restaurantDetail/${item.itemRestaurant}") }) {
-        item.itemImage?.let {
-            Image(
-                modifier = Modifier
-                    .width(100.dp)
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(10.dp)),
-                painter = rememberAsyncImagePainter(it),
-                contentDescription = null,
-                contentScale = ContentScale.Crop
-            )
-        }
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 15.dp)
-                .padding(bottom = 16.dp),
-        ) {
-            item.itemName?.let {
-                Text(
-                    text = it,
-                    style = TextStyle(
-                        color = primaryFontColor,
-                        fontSize = 22.sp,
-                        fontFamily = metropolisFontFamily,
-                        fontWeight = FontWeight.SemiBold,
-                        textAlign = TextAlign.Center
-                    )
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_location),
-                    contentDescription =null ,
-                    tint= orange2)
-                Spacer(modifier = Modifier.width(4.dp))
-                item.itemRestaurant?.let {
-                    Text(
-                        text = it,
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            fontFamily = metropolisFontFamily,
-                            textAlign = TextAlign.Center
-                        )
-                    )
-                }
-                Spacer(modifier = Modifier.width(6.dp))
-                Box(
-                    modifier = Modifier
-                        .width(5.dp)
-                        .height(5.dp)
-                        .clip(CircleShape)
-                        .background(orange)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                item.itemType?.let {
-                    Text(
-                        text = it,
-                        style = TextStyle(
-                            fontSize = 14.sp,
-                            fontFamily = metropolisFontFamily,
-                            textAlign = TextAlign.Center
-                        )
-                    )
-                }
-
-
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                item.itemPrice?.let {
-                    val formattedPrice = NumberFormat.getCurrencyInstance(Locale("vi", "VN")).format(it)
-                    Text(
-                        text = formattedPrice,
-                        style = TextStyle(
-                            fontSize = 20.sp,
-                            fontFamily =  metropolisFontFamily, // Thay thế FontFamily.Default bằng metropolisFontFamily nếu bạn có định nghĩa nó
-                            textAlign = TextAlign.Center
-                        )
-                    )
-                }
-            }
-        }
     }
 }
 

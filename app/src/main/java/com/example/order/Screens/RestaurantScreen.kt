@@ -52,6 +52,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -279,8 +280,11 @@ fun RestaurantScreen(homeViewModel: HomeViewModel = viewModel(), navController: 
 
                             restaurant?.restaurantName?.let { restaurantName ->
                                 val menus by menuViewModel.getMenusForRestaurant(restaurantName).collectAsState(initial = emptyList())
+                                val randomMenuList = remember(menus) {
+                                    menus.shuffled().take(5)
+                                }
                                 LazyRow() {
-                                    itemsIndexed(menus) { _, menuItem ->
+                                    itemsIndexed(randomMenuList) { _, menuItem ->
                                         Column(
                                             modifier = Modifier.padding(8.dp),
                                         ) {
@@ -316,11 +320,11 @@ fun RestaurantScreen(homeViewModel: HomeViewModel = viewModel(), navController: 
                                             }
                                             Spacer(modifier = Modifier.height(4.dp))
                                             menuItem.itemName?.let {
-                                                Text(
+                                                TruncatedText(
                                                     text = it,
-                                                    fontSize = 17.sp,
-                                                    color = primaryFontColor,
-                                                    fontWeight = FontWeight.Normal
+                                                    maxLines = 1, // Số dòng tối đa
+                                                    maxWidth = 100, // Chiều rộng tối đa
+                                                    fontSize = 17 // Kích thước font chữ
                                                 )
                                             }
                                         }
@@ -334,7 +338,18 @@ fun RestaurantScreen(homeViewModel: HomeViewModel = viewModel(), navController: 
         }
 
 }
-
+@Composable
+fun TruncatedText(text: String, maxLines: Int, maxWidth: Int, fontSize: Int) {
+    Text(
+        text = text,
+        fontSize = fontSize.sp,
+        color = Color.Black,
+        fontWeight = FontWeight.Normal,
+        maxLines = maxLines,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.width(maxWidth.dp)
+    )
+}
 @Composable
 fun DropdownMenu(
     categories: List<Category>,

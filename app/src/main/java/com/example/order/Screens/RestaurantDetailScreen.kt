@@ -34,7 +34,6 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
@@ -68,6 +67,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -171,24 +171,25 @@ fun RestaurantDetailScreen(
                                         color = Color.Gray
                                     )
                                 }
-                            }
-                            Box(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentAlignment = Alignment.CenterEnd
-                            ) {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.CenterEnd
+                                ) {
 
-                                menuItem.itemPrice?.let {
-                                    val formattedPrice = NumberFormat.getCurrencyInstance(
-                                        Locale("vi", "VN")
-                                    ).format(it)
-                                    Text(
-                                        text = formattedPrice,
-                                        fontSize = 24.sp,
-                                        color = primaryFontColor,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                                    menuItem.itemPrice?.let {
+                                        val formattedPrice = NumberFormat.getCurrencyInstance(
+                                            Locale("vi", "VN")
+                                        ).format(it)
+                                        Text(
+                                            text = formattedPrice,
+                                            fontSize = 24.sp,
+                                            color = primaryFontColor,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
                                 }
                             }
+
                         }
                         Spacer(modifier = Modifier.height(25.dp))
                         Box(
@@ -466,7 +467,7 @@ fun RestaurantDetailScreen(
                                             )
 
                                             Text(
-                                                text = "${restaurant.restaurantRate}" + " |${restaurant.ratingCount} Đánh giá",
+                                                text = "${restaurant.restaurantRate}" + " |Đánh giá",
                                                 modifier = Modifier.padding(bottom = 3.dp),
                                                 fontSize = 20.sp,
                                                 color = Color.White
@@ -565,16 +566,10 @@ fun RestaurantDetailScreen(
                                                             text = it,
                                                             fontSize = 24.sp,
                                                             color = primaryFontColor,
-                                                            fontWeight = FontWeight.Normal
-                                                        )
-                                                    }
-                                                    Spacer(modifier = Modifier.height(4.dp))
-                                                    menuItem.itemDescription?.let {
-                                                        androidx.compose.material.Text(
-                                                            text = it,
-                                                            fontSize = 18.sp,
-                                                            color = Color.Gray,
-                                                            fontWeight = FontWeight.Normal
+                                                            fontWeight = FontWeight.Normal,
+                                                            maxLines = 1,
+                                                            overflow = TextOverflow.Ellipsis,
+                                                            modifier = Modifier.width(200.dp)
                                                         )
                                                     }
                                                     Spacer(modifier = Modifier.height(18.dp))
@@ -592,22 +587,6 @@ fun RestaurantDetailScreen(
                                                             fontSize = 24.sp,
                                                             color = primaryFontColor,
                                                             fontWeight = FontWeight.Bold
-                                                        )
-                                                    }
-                                                }
-                                                Box(
-                                                    modifier = Modifier.fillMaxWidth(),
-                                                    contentAlignment = Alignment.CenterEnd
-                                                ) {
-                                                    IconButton(
-                                                        onClick = { },
-                                                        modifier = Modifier.size(50.dp)
-                                                    ) {
-                                                        Icon(
-                                                            imageVector = Icons.Default.AddCircle,
-                                                            contentDescription = null,
-                                                            modifier = Modifier.size(50.dp),
-                                                            tint = blue3
                                                         )
                                                     }
                                                 }
