@@ -132,4 +132,99 @@ class CartViewModel : ViewModel() {
             }
         }
     }
+    fun updateCartItemQuantity(userId: String, restaurantName: String, itemId: String, newQuantity: Int,) {
+        val currentCarts = _carts.value.toMutableMap()
+        val restaurantCart = currentCarts[restaurantName]
+
+        restaurantCart?.let {
+            val updatedItems = it.items!!.toMutableList()
+            val itemIndex = updatedItems.indexOfFirst { it?.id == itemId }
+            if (itemIndex != -1) {
+                val item = updatedItems[itemIndex]
+                if (item != null) {
+                    val updatedItem = item.copy(quantity = newQuantity)
+                    updatedItems[itemIndex] = updatedItem
+
+                    // Calculate the updated total
+                    val updatedTotal =
+                        updatedItems.filterNotNull().sumBy { (it.price ?: 0) * (it.quantity ?: 0) }
+
+                    // Create updated RestaurantCart
+                    val updatedRestaurantCart =
+                        restaurantCart.copy(items = updatedItems, total = updatedTotal)
+                    currentCarts[restaurantName] = updatedRestaurantCart
+
+                    // Update the cart state
+                    _carts.value = currentCarts
+
+                    // Update Firestore
+                    viewModelScope.launch {
+                        try {
+                            val cartRef = db.collection("carts").document(userId)
+                            val cartSnapshot = cartRef.get().await()
+                            val cart = cartSnapshot.toObject(Cart::class.java)
+                            if (cart != null) {
+                                val updatedRestaurantCarts = cart.restaurantCarts!!.toMutableMap()
+                                updatedRestaurantCarts[restaurantName] = updatedRestaurantCart
+                                val updatedCart =
+                                    cart.copy(restaurantCarts = updatedRestaurantCarts)
+                                cartRef.set(updatedCart).await()
+
+                            } else {
+
+                            }
+                        } catch (e: Exception) {
+
+                        }
+                        getCart(userId)
+                    }
+                }
+            }
+        }
+    }
+    fun removeItemFromCart(userId: String, restaurantName: String, itemId: String) {
+        val currentCarts = _carts.value.toMutableMap()
+        val restaurantCart = currentCarts[restaurantName]
+
+        restaurantCart?.let {
+            val updatedItems = it.items!!.toMutableList()
+            val itemIndex = updatedItems.indexOfFirst { it?.id == itemId }
+            if (itemIndex != -1) {
+                updatedItems.removeAt(itemIndex)
+
+                // Calculate the updated total
+                val updatedTotal =
+                    updatedItems.filterNotNull().sumBy { (it.price ?: 0) * (it.quantity ?: 0) }
+
+                // Create updated RestaurantCart
+                val updatedRestaurantCart =
+                    restaurantCart.copy(items = updatedItems, total = updatedTotal)
+                currentCarts[restaurantName] = updatedRestaurantCart
+
+                // Update the cart state
+                _carts.value = currentCarts
+
+                // Update Firestore
+                viewModelScope.launch {
+                    try {
+                        val cartRef = db.collection("carts").document(userId)
+                        val cartSnapshot = cartRef.get().await()
+                        val cart = cartSnapshot.toObject(Cart::class.java)
+                        if (cart != null) {
+                            val updatedRestaurantCarts = cart.restaurantCarts!!.toMutableMap()
+                            updatedRestaurantCarts[restaurantName] = updatedRestaurantCart
+                            val updatedCart = cart.copy(restaurantCarts = updatedRestaurantCarts)
+                            cartRef.set(updatedCart).await()
+
+                        } else {
+
+                        }
+                    } catch (e: Exception) {
+
+                    }
+                    getCart(userId)
+                }
+            }
+        }
+    }
 }

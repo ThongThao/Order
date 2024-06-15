@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,12 +16,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -35,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -50,8 +54,12 @@ import com.example.order.Screens.HomeScreens
 import com.example.order.Screens.getLocation
 import com.example.order.model.Order
 import com.example.order.model.OrderItem
+import com.example.order.ui.theme.Shapes
+import com.example.order.ui.theme.delete
+import com.example.order.ui.theme.grayFont
 import com.example.order.ui.theme.lightGray
 import com.example.order.ui.theme.orange
+import com.example.order.ui.theme.orange1
 import com.example.order.ui.theme.red
 import com.example.order.viewmodels.UserViewModel
 import java.text.NumberFormat
@@ -71,7 +79,6 @@ fun CartDetail(
     userId?.let {
         cartViewModel.getCart(userId)
     }
-    val ship=20000
     val cart by cartViewModel.carts.collectAsState()
     var location by remember { mutableStateOf("") }
 
@@ -181,10 +188,10 @@ fun CartDetail(
             }
             // Hiển thị chi tiết các món ăn trong giỏ hàng của nhà hàng
             if (restaurantCart != null && restaurantCart.items != null && restaurantCart.items.isNotEmpty()) {
-                LazyColumn(modifier = Modifier.height(280.dp)) {
+                LazyColumn(modifier = Modifier.height(320.dp)) {
                     items(restaurantCart.items) { cartItem ->
                         cartItem?.let {
-                            CartItemRow(cartItem)
+                            CartItemRow(userId,cartItem,cartViewModel,restaurantName)
                         }
                     }
                 }
@@ -203,20 +210,8 @@ fun CartDetail(
                     .fillMaxWidth()
                     .padding(start = 15.dp, end = 15.dp, top = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(text = "Phí giao hàng:")
-                val formattedPrice = NumberFormat.getCurrencyInstance(
-                       Locale("vi", "VN")
-                   ).format(ship)
-                Text(text = formattedPrice, fontSize = 20.sp)
-
-            }
-            Row(verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp, end = 15.dp, top = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(text = "Tổng cộng:")
-                val tong= ship +  (restaurantCart?.total ?: 0)
+                val tong=restaurantCart?.total ?: 0
                 val formattedPrice = NumberFormat.getCurrencyInstance(
                     Locale("vi", "VN")
                 ).format(tong)
@@ -243,7 +238,7 @@ fun CartDetail(
                         custumerPhone = user.phoneNumber,
                         custumerAdd = location,
                         date = Date(),
-                        total = restaurantCart?.total?.plus(ship),
+                        total = restaurantCart?.total,
                         restaurant = restaurantName,
                         status = OrderStatus.Processing.name,
                         items = items
@@ -299,60 +294,180 @@ fun CartDetail(
     }
 
     @Composable
-    fun CartItemRow(cartItem: CartItem) {
-        Column(
+    fun CartItemRow(userId: String?,cartItem: CartItem,cartViewModel: CartViewModel,restaurantName: String?) {
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = Color.White,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp)
+                .padding(10.dp)
+                .background(
+                    color = lightGray,
+                    shape = RoundedCornerShape(16.dp),
+                )
+                .padding(bottom = 2.dp),
+            shadowElevation = 7.dp,
+            onClick = {
+                //den trang chi tiet
+            }
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.size(width = 80.dp, height = 80.dp)
+                androidx.compose.material.Surface(
+                    shape = Shapes.small,
+                    modifier = Modifier.size(
+                        width = 90.dp,
+                        height = 90.dp
+                    )
                 ) {
                     Image(
-                        painter = rememberAsyncImagePainter(cartItem.image),
-                        contentDescription = null,
+                        painter = rememberAsyncImagePainter(cartItem?.image),
+                        contentDescription = "",
                         contentScale = ContentScale.Crop
                     )
                 }
-                Spacer(modifier = Modifier.width(16.dp))
-                Column {
-                    cartItem.name?.let {
-                        Text(
-                            text = it,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 22.sp
-                        )
-                    }
-                    Text(text = "x${cartItem.quantity}", color = Color.Black)
-                    cartItem.note?.let {
-                        if (it.isNotEmpty()) {
-                            Text(text = "Ghi chú: $it", color = Color.Gray)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(2f)
+                        .padding(horizontal = 10.dp, vertical = 0.dp),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "${cartItem.name}",
+                        fontSize = 22.sp,
+                        style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Text(
+                        text = "${cartItem.price}",
+                        fontSize = 16.sp,
+                        color = grayFont,
+                        fontWeight = FontWeight.Medium
+                    ) //don gia
+
+                    Spacer(modifier = Modifier.height(6.dp))
+                    cartItem.price?.let { price ->
+                        cartItem.quantity?.let { quantity ->
+                            val totalPrice = price * quantity
+                            val formattedPrice = NumberFormat.getCurrencyInstance(
+                                Locale("vi", "VN")
+                            ).format(totalPrice)
+                            Text(
+                                text = formattedPrice, // hiển thị tổng tiền của mặt hàng với 2 chữ số thập phân
+                                fontSize = 17.sp,
+                                color = Color.Black,
+                                style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium
+                            )
                         }
                     }
-                    TextButton(
-                        onClick = { /*TODO*/ }
+
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(0.3f),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    var value by remember { mutableStateOf(cartItem.quantity) }
+
+                    Button(
+                        onClick = { value = value!! + 1
+                            cartViewModel.updateCartItemQuantity(userId!!,restaurantName!!,
+                                cartItem.id!!, value!!
+                            )
+
+                        },
+                        contentPadding = PaddingValues(),
+                        shape = CircleShape,
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color(
+                                0xFFFFF1D8
+                            )
+                        ),
+                        modifier = Modifier
+                            .width(20.dp)
+                            .height(20.dp)
                     ) {
-                        Text(
-                            text = "Chỉnh sửa",
-                            color = orange,
-                            fontSize = 17.sp,
-                            fontWeight = FontWeight.SemiBold,
+                        Icon(
+                            painterResource(id = R.drawable.ic_plus),
+                            null,
+                            modifier = Modifier
+                                .size(16.dp)
                         )
                     }
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                cartItem.price?.let {
-                    val formattedPrice = NumberFormat.getCurrencyInstance(
-                        Locale("vi", "VN")
-                    ).format(it)
-                    Text(text = formattedPrice, color = orange, fontSize = 20.sp)
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .width(23.dp)
+                            .height(23.dp)
+                            .clip(CircleShape)
+                            .background(
+                                color = orange1,
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "$value",
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 15.sp,
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = { if (value!! > 1) {
+                            value = value!! - 1
+                            cartViewModel.updateCartItemQuantity(userId!!,restaurantName!!,
+                                cartItem.id!!, value!!
+                            )
+                        }
+                        },
+                        contentPadding = PaddingValues(),
+                        shape = CircleShape,
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color(
+                                0xFFFFF1D8
+                            )
+                        ),
+                        modifier = Modifier
+                            .width(20.dp)
+                            .height(20.dp)
+                    ) {
+                        Icon(
+                            painterResource(id = R.drawable.ic_minus),
+                            null,
+                            modifier = Modifier
+                                .size(16.dp)
+                        )
+                    }
+
                 }
             }
+            Row( ) {
+                androidx.compose.material3.Surface(
+                    onClick = {
+cartViewModel.removeItemFromCart(userId!!, restaurantName!!, cartItem.id!!)
+                    },
+                    shape = CircleShape,
+                    color = delete
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = "",
+                        tint = Color(0xFFFFFFFF),
+                        modifier = Modifier
+                            .size(20.dp)
 
+                    )
+                }
+            }
         }
     }

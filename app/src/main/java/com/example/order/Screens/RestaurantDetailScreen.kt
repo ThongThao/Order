@@ -13,6 +13,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -26,6 +27,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
@@ -37,7 +40,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -74,7 +76,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.app.R
 import com.example.order.FilledButton
 import com.example.order.model.Menu
-import com.example.order.navigation.Screen
+import com.example.order.ui.theme.Shapes
 import com.example.order.ui.theme.blue2
 import com.example.order.ui.theme.blue3
 import com.example.order.ui.theme.gray
@@ -336,38 +338,38 @@ fun RestaurantDetailScreen(
                                 .fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-
-                            Box(
+                            Button(
+                                onClick = { navController.popBackStack()},
+                                contentPadding = PaddingValues(),
+                                shape = Shapes.small,
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Color.White,
+                                    contentColor = Color.Black
+                                ),
+                                //                    elevation = 5.dp,
                                 modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(shape = CircleShape)
-                                    .background(color = Color.White)
+                                    .width(38.dp)
+                                    .height(38.dp)
                             ) {
-
-                                IconButton(onClick = { navController.popBackStack() }) {
-                                    Icon(
-                                        imageVector = Icons.Default.ArrowBack,
-                                        contentDescription = "Back",
-                                        tint = orange
-                                    )
-                                }
+                                androidx.compose.material.Icon(imageVector = Icons.Default.ArrowBack, contentDescription ="" )
                             }
-                            Box(
+                            Button(
+                                onClick = { navController.popBackStack()},
+                                contentPadding = PaddingValues(),
+                                shape = Shapes.small,
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Color.White,
+                                    contentColor = Color.Black
+                                ),
+                                //                    elevation = 5.dp,
                                 modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(shape = CircleShape)
-                                    .background(color = Color.White),
+                                    .width(38.dp)
+                                    .height(38.dp)
                             ) {
-
-                                IconButton(onClick = {
-                                    navController.navigate(Screen.Cart.createRoute(userId!!))
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Default.ShoppingCart,
-                                        contentDescription = "Back",
-                                        tint = orange
-                                    )
-                                }
+                                androidx.compose.material.Icon(
+                                    imageVector = Icons.Default.Info,
+                                    contentDescription = ""
+                                )
                             }
 
                         }
@@ -410,23 +412,6 @@ fun RestaurantDetailScreen(
                                     Box(modifier = Modifier.fillMaxWidth(),
                                         contentAlignment = Alignment.BottomEnd) {
                                         Column {
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(40.dp)
-                                                    .clip(shape = CircleShape)
-                                                    .background(color = Color.White),
-
-                                                ) {
-
-                                                IconButton(onClick = { navController.popBackStack() }) {
-                                                    Icon(
-                                                        imageVector = Icons.Default.Info,
-                                                        contentDescription = "Back",
-                                                        tint = orange,
-                                                        modifier= Modifier.size(30.dp)
-                                                    )
-                                                }
-                                            }
                                             Spacer(modifier = Modifier.height(5.dp))
                                             Box(
                                                 modifier = Modifier
@@ -448,7 +433,7 @@ fun RestaurantDetailScreen(
                                             }
                                         }
                                     }
-                                    Spacer(modifier = Modifier.height(105.dp))
+                                    Spacer(modifier = Modifier.height(145.dp))
                                     Column() {
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically,
