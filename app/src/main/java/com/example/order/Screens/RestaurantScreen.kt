@@ -230,13 +230,16 @@ fun RestaurantScreen(homeViewModel: HomeViewModel = viewModel(), navController: 
                                         }
                                     }
                                     Spacer(modifier = Modifier.height(4.dp))
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
+
                                         restaurant?.restaurantName?.let {
                                             Text(
                                                 text = it,
                                                 fontSize = 22.sp,
                                                 style = MaterialTheme.typography.titleMedium,
-                                                fontWeight = FontWeight.SemiBold
+                                                fontWeight = FontWeight.SemiBold,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                modifier = Modifier.width(170.dp)
                                             )
                                         }
                                         Spacer(modifier = Modifier.width(4.dp))
@@ -256,7 +259,7 @@ fun RestaurantScreen(homeViewModel: HomeViewModel = viewModel(), navController: 
                                                 )
                                             }
                                         }
-                                    }
+
                                     Spacer(modifier = Modifier.height(3.dp))
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(
