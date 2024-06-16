@@ -62,6 +62,7 @@ fun OrderScreen(
     LaunchedEffect(userId) {
         userId?.let { orderViewModel.fetchOrdersForUser(it) }
     }
+    val sortedOrders = orders.sortedByDescending { it.date }
 
     androidx.compose.material.Scaffold(
         scaffoldState = rememberScaffoldState(),
@@ -95,7 +96,7 @@ fun OrderScreen(
                     .padding(12.dp)
             ) {
                 orders.let {
-                    allOrder(userId ,order = orders, navController)
+                    allOrder(userId ,order =  sortedOrders, navController)
                 }
             }
         }
