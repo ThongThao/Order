@@ -1,4 +1,4 @@
-package com.example.order.Screens
+
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -43,7 +43,7 @@ import java.util.Date
 import java.util.UUID
 
 @Composable
-fun RatingAndComment(
+fun RatingAndCommentScreen(
     userId: String?,
     restaurantName: String?,
     navController: NavController,

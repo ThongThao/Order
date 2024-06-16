@@ -3,6 +3,8 @@ package com.example.order.Screens
 import CartDetail
 import CartScreen
 import OrderDetail
+import RateRestaurantScreen
+import RatingAndCommentScreen
 import SignInScreen
 import android.annotation.SuppressLint
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -42,7 +44,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.app.R
 import com.example.order.navigation.Screen
-import com.example.order.screens.RateRestaurantScreen
 import com.example.order.ui.theme.metropolisFontFamily
 import com.example.order.ui.theme.orange
 import com.example.order.ui.theme.placeholderColor
@@ -271,6 +272,14 @@ fun HomeNavHost(navHostController: NavHostController, userId: String?) {
                 navHostController.navigate(Screen.Restaurant.createRoute(userId ?: ""))
             }, navController = navHostController, userId = userId)
         }
+        composable(route = "list/{userId}/{categoryName}",
+            arguments = listOf(navArgument("userId"){ type = NavType.StringType }, navArgument("categoryName"){ type = NavType.StringType })) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId")
+            val categoryName = backStackEntry.arguments?.getString("categoryName")
+            RestaurantList(userId = userId, categoryName =categoryName , navController =navHostController ) {
+            }
+        }
+
 
         composable(Screen.ChangeAddress.route) {
             ChangeAddressScreen(onBackClick = {
@@ -304,7 +313,7 @@ fun HomeNavHost(navHostController: NavHostController, userId: String?) {
 
             )
         }
-        composable(route = "rating_detail/{restaurantName}",
+        composable(route = "rating_detail_screen/{restaurantName}",
             arguments = listOf( navArgument("restaurantName"){ type = NavType.StringType })) { backStackEntry ->
             val restaurantName = backStackEntry.arguments?.getString("restaurantName")
            RateRestaurantScreen(restaurantName!!, navController =navHostController )
@@ -318,7 +327,7 @@ fun HomeNavHost(navHostController: NavHostController, userId: String?) {
             arguments = listOf(navArgument("userId"){ type = NavType.StringType }, navArgument("restaurantName"){ type = NavType.StringType })) { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId")
             val restaurantName = backStackEntry.arguments?.getString("restaurantName")
-            RatingAndComment(userId,restaurantName,navController = navHostController)
+            RatingAndCommentScreen(userId,restaurantName,navController = navHostController)
         }
     }
 }

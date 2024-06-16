@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Geocoder
 import android.os.Looper
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -110,7 +111,7 @@ fun HomeScreen(
                     Location(onChangeAddressClick)
                     SearchField()
                     Spacer(modifier = Modifier.size(18.dp))
-                    Categorys(categoryList)
+                    Categorys(categoryList,navController,userId)
                     Spacer(modifier = Modifier.size(25.dp))
                 }
                 item {
@@ -273,7 +274,7 @@ fun ProfileImage1(modifier: Modifier = Modifier, image: String) {
 
 }
 @Composable
-fun Categorys(categoryList: List<Category>) {
+fun Categorys(categoryList: List<Category>,navController: NavHostController,userId: String?) {
     val collator = Collator.getInstance(Locale("vi", "VN"))
     val sortedCategoryList = categoryList.sortedWith(compareBy(collator) { it.categoryName })
 
@@ -282,7 +283,10 @@ fun Categorys(categoryList: List<Category>) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                .clickable { /* Xử lý khi nút được nhấn */ }) {
+                .clickable {
+                    navController.navigate("list/${userId!!}/${item.categoryName}")
+                    Log.d("RatingAndComment", "Rating: ${userId}, Comment: ${item.categoryName}")
+                }) {
                 Image(
                     modifier = Modifier
                         .width(80.dp)

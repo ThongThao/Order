@@ -37,6 +37,22 @@ class RestaurantViewModel : ViewModel() {
         }
         return topRatedRestaurantsFlow
     }
+    private val _restaurants1 = MutableStateFlow<List<Restaurant>>(emptyList())
+    val restaurants1: StateFlow<List<Restaurant>> = _restaurants1
+    fun getRestaurantsByCategory(category: String): StateFlow<List<Restaurant>> {
+        val restaurantsByCategoryFlow = MutableStateFlow<List<Restaurant>>(emptyList())
+        viewModelScope.launch {
+            try {
+                // Gọi repository để lấy danh sách nhà hàng theo category
+                val restaurants1 = repository.getRestaurantsByCategory(category)
+                restaurantsByCategoryFlow.value = restaurants1
+            } catch (e: Exception) {
+                // Xử lý ngoại lệ nếu cần thiết
+            }
+        }
+        return restaurantsByCategoryFlow
+    }
+
     fun getRestaurantById(restaurantId: String?): StateFlow<Restaurant?> {
         val restaurantFlow = MutableStateFlow<Restaurant?>(null)
         viewModelScope.launch {

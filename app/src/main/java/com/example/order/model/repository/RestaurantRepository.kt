@@ -22,4 +22,15 @@ class RestaurantRepository {
             emit(getRestaurants().find { it.restaurantName == restaurantName })
         }
     }
+
+    suspend fun getRestaurantsByCategory(category: String): List<Restaurant> {
+        return db
+            .whereEqualTo("restaurantType", category)
+            .get()
+            .await()
+            .documents
+            .mapNotNull { document ->
+                document.toObject(Restaurant::class.java)
+            }
+    }
 }

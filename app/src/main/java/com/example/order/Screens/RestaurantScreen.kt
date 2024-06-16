@@ -78,10 +78,12 @@ import java.util.Locale
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RestaurantScreen(homeViewModel: HomeViewModel = viewModel(), navController: NavHostController,
-                     restaurantViewModel: RestaurantViewModel = viewModel(),
-                     menuViewModel: MenuViewModel = viewModel(),
-                     onBackClick: () -> Unit
+fun RestaurantScreen(
+    navController: NavHostController,
+    homeViewModel: HomeViewModel = viewModel(),
+    restaurantViewModel: RestaurantViewModel = viewModel(),
+    menuViewModel: MenuViewModel = viewModel(),
+    onBackClick: () -> Unit,
 ) {
     val restaurantList by restaurantViewModel.restaurants.collectAsState()
     val categories by homeViewModel.categories.collectAsState()
@@ -368,7 +370,7 @@ fun DropdownMenu(
             modifier = Modifier.border(width = 1.dp, color = Color.LightGray,shape = RoundedCornerShape(30.dp))) {
 
         Text(
-            text = selectedCategory?.categoryName ?: "Select category",
+            text = selectedCategory?.categoryName ?: "Chọn",
             modifier = Modifier
                 .clickable { expanded = true }
                 .padding(start = 10.dp)
